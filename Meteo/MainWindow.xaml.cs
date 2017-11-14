@@ -50,9 +50,8 @@ namespace Meteo
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            Task Refresh = new Task(Downloader.FindNewestWeather);
-            Refresh.Start();
-            Task.WaitAll(Refresh);
+            Downloader.FindNewestWeather();
+            SetWeatherSource();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -85,7 +84,6 @@ namespace Meteo
             dispatcherTimer_Tick(this, null);
             Timer.Stop();
             Timer.Start();
-            SetWeatherSource();
             UpdateTextbox();
         }
 
