@@ -12,7 +12,7 @@ namespace Meteo
         public int Y;
         public int X;
 
-        private Location(string Name, int X, int Y) : this(X, Y)
+        public Location(string Name, int X, int Y) : this(X, Y)
         {
             this.Name = Name;
         }

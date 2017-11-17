@@ -11,8 +11,10 @@ namespace Meteo
 {
     class Downloader
     {
-        public Downloader()
+        public Downloader(string path)
         {
+            Path = path;
+
             DateTime date = DateTime.Now;
             if (date.Hour < 6)
                 WeatherDate = DateTime.Today.AddHours(-6);
@@ -23,23 +25,18 @@ namespace Meteo
             else
                 WeatherDate = DateTime.Today.AddHours(12);
 
-            System.IO.Directory.CreateDirectory(Path.GetTempPath() + "Weather");
-            tempPath = Path.GetTempPath() + "Weather";
-
             DownloadLegend();
 
-
             RefreshImage();
-
         }
 
         public DateTime WeatherDate { get; private set; }
         private DateTime CurrentWeatherDate;
         public string DateString { get { return WeatherDate.ToString("yyyyMMddHH"); } }
-        public string FullNameWeather { get { return $"{tempPath}\\Date{DateString}X{Location.X}Y{Location.Y}.png"; } }
-        public string FullNameLegenda { get { return $"{tempPath}\\Legenda.png"; } }
+        public string FullNameWeather { get { return $"{Path}\\Date{DateString}X{Location.X}Y{Location.Y}.png"; } }
+        public string FullNameLegenda { get { return $"{Path}\\Legenda.png"; } }
         public Location Location = Location.Cities.Poznan;
-        public readonly string tempPath;
+        public readonly string Path;
       
         private void RefreshImage()
         {
@@ -61,7 +58,7 @@ namespace Meteo
                     client.DownloadFile("http://www.meteo.pl/um/metco/leg_um_pl_cbase_256.png", FullNameLegenda);
                 }
             }
-            var info = new FileInfo($"{tempPath}\\Legenda.png");
+            var info = new FileInfo($"{Path}\\Legenda.png");
             if (info.Length < (5 * 10 ^ 3))
             {
                 File.Delete(FullNameLegenda);
@@ -134,20 +131,20 @@ namespace Meteo
 
         private void ClearTemp()
         {
-
-            var NewestFiles = from file in Directory.GetFiles(tempPath)
+            var NewestFiles = from file in Directory.GetFiles(Path)
                               let loc = LocationFromName(file)
                               let date = DateFromName(file)
                               where loc != null && date != null
                               where date.Value.AddDays(2) > DateTime.Now
                               group date.Value by loc into data
                               let date = data.OrderByDescending(x => x).First()
-                              select $"{tempPath}\\Date{date.ToString("yyyyMMddHH")}X{data.Key.X}Y{data.Key.Y}.png";
+                              select $"{Path}\\Date{date.ToString("yyyyMMddHH")}X{data.Key.X}Y{data.Key.Y}.png";
 
             var list = NewestFiles.ToList();
-            foreach (var file in Directory.GetFiles(tempPath))
+            //Remove only meteograms, leave everything else alone
+            foreach (var file in Directory.GetFiles(Path))
             {
-                if (list.Contains(file) || file == FullNameLegenda)
+                if (list.Contains(file) || file == FullNameLegenda || file == Path+"\\settings.xml")
                 {
                     Logging.Log($"Ommited: {file}");
                     continue;
@@ -164,9 +161,7 @@ namespace Meteo
                         continue;
                     }
                 }
-            }
-            
+            }    
         }
-        
     }
 }

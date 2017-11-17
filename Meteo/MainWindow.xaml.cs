@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace Meteo
 {
@@ -26,16 +27,20 @@ namespace Meteo
         {
             InitializeComponent();
 
-            Downloader = new Downloader();
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetTempPath() + "Weather");
+            FolderPath = System.IO.Path.GetTempPath() + "Weather";
+
+            Downloader = new Downloader(FolderPath);
 
             Timer = new System.Windows.Threading.DispatcherTimer();
             Timer.Tick += dispatcherTimer_Tick;
             Timer.Interval = new TimeSpan(1, 0, 0);
             Timer.Start();
 
-            Locations = new List<Location>() { Location.Cities.Bialystok, Location.Cities.Bydgoszcz, Location.Cities.Gdansk, Location.Cities.GorzowWielkoposki, Location.Cities.Katowice, Location.Cities.Kielce, Location.Cities.Krakow, Location.Cities.Lodz, Location.Cities.Lublin, Location.Cities.Olsztyn, Location.Cities.Opole, Location.Cities.Poznan, Location.Cities.Rzeszow, Location.Cities.Szczecin, Location.Cities.Torun, Location.Cities.Warszawa, Location.Cities.Wroclaw, Location.Cities.ZielonaGora };
+            Manager = new XMLManager(FolderPath);
+            Locations = Manager.ReturnAllLocations().ToList();
             CityList.ItemsSource = Locations;
-            CityList.SelectedIndex = 11;
+            CityList.SelectedIndex = Locations.IndexOf(Manager.ReturnLastLocation());
             Downloader.Location = (Location)CityList.SelectedItem;
 
             SetLegendaSource();
@@ -44,6 +49,8 @@ namespace Meteo
             
         }
 
+        public readonly string FolderPath;
+        private XMLManager Manager;
         private List<Location> Locations;
         private Downloader Downloader;
         private System.Windows.Threading.DispatcherTimer Timer;
