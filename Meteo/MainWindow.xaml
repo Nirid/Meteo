@@ -21,20 +21,21 @@
         <Button x:Name="RefreshButton" Content="Odśwież" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="155" Click="Button_Click"/>
         <ComboBox x:Name="CityList" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CityList_SelectionChanged" />
         <Label Content="Miejsce:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="ManualMode" Content="Tryb manualny" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,117,0,0" Checked="ManualMode_Checked" Unchecked="ManualMode_Unchecked"/>
-        <TextBox x:Name="YTextbox" HorizontalAlignment="Left" Height="23" Margin="12,221,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
-        <TextBox x:Name="XTextbox" HorizontalAlignment="Left" Height="23" Margin="11,167,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False" RenderTransformOrigin="-0.286,1.424"/>
-        <Label Content="X:" HorizontalAlignment="Left" Margin="10,141,0,0" VerticalAlignment="Top" RenderTransformOrigin="2.242,2.253"/>
-        <Label Content="Y:" HorizontalAlignment="Left" Margin="11,195,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="SetLocalizationButton" Content="Ustaw" HorizontalAlignment="Left" Margin="10,267,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" Click="SetLocalizationButton_Click"/>
-        <TextBox x:Name="NewLocalizationNameTextbox" HorizontalAlignment="Left" Height="23" Margin="10,334,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
-        <Label Content="Nazwa nowego miejsca:" HorizontalAlignment="Left" Margin="10,303,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="SaveNewLocalizationButton" Content="Zapisz pod nazwą" HorizontalAlignment="Left" Margin="10,372,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" />
-
+        <CheckBox x:Name="ManualMode" Content="Tryb manualny" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,139,0,0" Checked="ManualMode_Checked" Unchecked="ManualMode_Unchecked"/>
+        <TextBox x:Name="YTextbox" HorizontalAlignment="Left" Height="23" Margin="12,243,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+        <TextBox x:Name="XTextbox" HorizontalAlignment="Left" Height="23" Margin="11,189,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False" RenderTransformOrigin="-0.286,1.424"/>
+        <Label Content="X:" HorizontalAlignment="Left" Margin="10,163,0,0" VerticalAlignment="Top" RenderTransformOrigin="2.242,2.253"/>
+        <Label Content="Y:" HorizontalAlignment="Left" Margin="11,217,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="SetLocalizationButton" Content="Ustaw" HorizontalAlignment="Left" Margin="10,289,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" Click="SetLocalizationButton_Click"/>
+        <TextBox x:Name="NewLocalizationNameTextbox" HorizontalAlignment="Left" Height="23" Margin="10,356,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
+        <Label Content="Nazwa nowego miejsca:" HorizontalAlignment="Left" Margin="10,325,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="SaveNewLocalizationButton" Content="Zapisz pod nazwą" HorizontalAlignment="Left" Margin="10,394,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" />
+        <Button x:Name="SetDefaultButton" Content="Ustaw jako domyślne" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="155" RenderTransformOrigin="0.427,0.9" Click="SetDefaultButton_Click"/>
 
 
         <tb:TaskbarIcon x:Name="Notifycation" IconSource="Resources/icon.ico" ToolTipText="Meteo App" 
                         LeftClickCommand="{StaticResource ControlWindow}" LeftClickCommandParameter="{x:Reference Name=window}"  />
+
 
 
 

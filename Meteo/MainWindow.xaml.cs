@@ -38,9 +38,9 @@ namespace Meteo
             Timer.Start();
 
             Manager = new XMLManager(FolderPath);
-            Locations = Manager.ReturnAllLocations().ToList();
+            Locations = Manager.AllLocations.ToList();
             CityList.ItemsSource = Locations;
-            CityList.SelectedIndex = Locations.IndexOf(Manager.ReturnLastLocation());
+            CityList.SelectedIndex = Locations.IndexOf(Manager.LastLocation);
             Downloader.Location = (Location)CityList.SelectedItem;
 
             SetLegendaSource();
@@ -83,6 +83,10 @@ namespace Meteo
         private void CityList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Downloader.Location = (Location)CityList.SelectedItem;
+            if (Manager.LastLocation == Downloader.Location)
+                SetDefaultButton.IsEnabled = false;
+            else
+                SetDefaultButton.IsEnabled = true;
             ForceUpdate();
         }
 
@@ -145,6 +149,11 @@ namespace Meteo
                 }
             }
         }
-      
+
+        private void SetDefaultButton_Click(object sender, RoutedEventArgs e)
+        {
+            Manager.SetLastLocation((Location)CityList.SelectedItem);
+            SetDefaultButton.IsEnabled = false;
+        }
     }
 }

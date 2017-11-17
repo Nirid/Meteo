@@ -29,6 +29,7 @@ namespace Meteo
                 this.X = X;
             else
                 throw new ArgumentOutOfRangeException("X must have allowed value");
+            Name = "";
         }
 
         public static bool operator ==(Location f1, Location f2)
