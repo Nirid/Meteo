@@ -32,6 +32,29 @@ namespace Meteo
             Name = "";
         }
 
+        public static (int X,int Y) SnapToGrid(int X,int Y)
+        {
+                if ((((Y - 17) / 7.0) % 1) != 0.0)
+                {
+                    Y = ((int)Math.Round((Y - 17) / 7.0) * 7) + 17;
+                }
+                if (Y < 17)
+                    Y = 17;
+                if (Y > 598)
+                    Y = 598;
+                if ((((X - 17) / 7.0) % 1) != 0.0)
+                {
+                    X = ((int)Math.Round((X - 17) / 7.0) * 7) + 17;
+                }
+                if (X < 17)
+                    X = 17;
+                if (X > 430)
+                    X = 430;
+
+            return (X, Y);
+            
+        }
+
         public static bool operator ==(Location f1, Location f2)
         {
             if (object.ReferenceEquals(f1, f2))

@@ -82,6 +82,10 @@ namespace Meteo
 
         private void CityList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if(CityList.SelectedIndex < 0 || CityList.SelectedIndex >= CityList.Items.Count)
+            {
+                return;
+            }
             Downloader.Location = (Location)CityList.SelectedItem;
             if (Manager.LastLocation == Downloader.Location)
                 SetDefaultButton.IsEnabled = false;
@@ -124,27 +128,12 @@ namespace Meteo
 
         private void SetLocalizationButton_Click(object sender, RoutedEventArgs e)
         {
-            if(ManualMode.IsChecked.Value)
+            if (ManualMode.IsChecked.Value)
             {
-                if(int.TryParse(YTextbox.Text, out var Y) && int.TryParse(XTextbox.Text, out var X))
+                if (int.TryParse(YTextbox.Text, out var Y) && int.TryParse(XTextbox.Text, out var X))
                 {
-                    if((((Y-17)/7.0) % 1) != 0.0)
-                    {
-                        Y = ((int)Math.Round((Y - 17) / 7.0) * 7) + 17;
-                    }
-                    if (Y < 17)
-                        Y = 17;
-                    if (Y > 598)
-                        Y = 598;
-                    if ((((X - 17) / 7.0) % 1) != 0.0)
-                    {
-                        X = ((int)Math.Round((X - 17) / 7.0) * 7) + 17;
-                    }
-                    if (X < 17)
-                        X = 17;
-                    if (X > 430)
-                        X = 430;
-                    Downloader.Location = new Location(X,Y);
+                    var loc = Location.SnapToGrid(X, Y);
+                    Downloader.Location = new Location(loc.X,loc.Y);
                     ForceUpdate();
                 }
             }
@@ -154,6 +143,23 @@ namespace Meteo
         {
             Manager.SetLastLocation((Location)CityList.SelectedItem);
             SetDefaultButton.IsEnabled = false;
+        }
+
+        private void SaveNewLocalizationButton_Click(object sender, RoutedEventArgs e)
+        {
+            string name = NewLocalizationNameTextbox.Text;
+            if(int.TryParse(YTextbox.Text, out var Y) && int.TryParse(XTextbox.Text, out var X))
+            {
+                var loc = Location.SnapToGrid(X, Y);
+                var location = new Location(name, loc.X, loc.Y);
+                if (!Manager.AllLocations.Contains(location))
+                {
+                    Manager.AddLocation(location);
+                    Locations = Manager.AllLocations.ToList();
+                    CityList.ItemsSource = Locations;
+                    CityList.SelectedItem = location;
+                }
+            }
         }
     }
 }

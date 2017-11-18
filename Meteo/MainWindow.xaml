@@ -29,7 +29,7 @@
         <Button x:Name="SetLocalizationButton" Content="Ustaw" HorizontalAlignment="Left" Margin="10,289,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" Click="SetLocalizationButton_Click"/>
         <TextBox x:Name="NewLocalizationNameTextbox" HorizontalAlignment="Left" Height="23" Margin="10,356,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
         <Label Content="Nazwa nowego miejsca:" HorizontalAlignment="Left" Margin="10,325,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="SaveNewLocalizationButton" Content="Zapisz pod nazwą" HorizontalAlignment="Left" Margin="10,394,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" />
+        <Button x:Name="SaveNewLocalizationButton" Content="Zapisz pod nazwą" HorizontalAlignment="Left" Margin="10,394,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" Click="SaveNewLocalizationButton_Click" />
         <Button x:Name="SetDefaultButton" Content="Ustaw jako domyślne" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="155" RenderTransformOrigin="0.427,0.9" Click="SetDefaultButton_Click"/>
 
 

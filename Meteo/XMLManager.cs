@@ -36,7 +36,6 @@ namespace Meteo
         public IEnumerable<Location> AllLocations => Doc.Descendants("Location").Select(x => XElementToLocation(x));
         public Location LastLocation => Doc.Descendants("LastLocation").Select(x => XElementToLocation(x)).Single();
         
-
         private void InitializeDocument()
         {
             Doc = new XDocument(new XElement("Root",
