@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Device.Location;
 
 namespace Meteo
 {
@@ -53,6 +54,26 @@ namespace Meteo
 
             return (X, Y);
             
+        }
+
+        public static Location GPSToLocation(GeoCoordinate position)
+        {
+            double lat = position.Latitude; //E-W
+            double lon = position.Longitude; //S-N
+            //Equations from multiple polynomial regression of GPS data to location data
+            double X = -5.717114996 * 0.00001 * lon*lon*lon - 4.666954368 * 0.000001 * lon*lon*lat - 4.915961914 * 0.00001 * lon*lat*lat - 1.010349445 * 0.00001 * lat*lat*lat 
+                + 3.578943599 * 0.001 *lon*lon - 4.964606815 * 0.01 * lon*lat + 2.635647828 * 0.001 * lat*lat + 5.091380838 * lon + 0.866611182 * lat - 68.26117676;
+            double Y = -8.79278964 * 0.000001 * lon*lon*lon + 3.932780099 * 0.0001 * lon*lon*lat - 3.981124124 * 0.0000001 * lon*lat*lat + 1.188301147 * 0.00001 * lat*lat*lat
+            - 3.682281501 * 0.01 * lon*lon - 1.506658693 * 0.01 * lon*lat - 2.016991693 * 0.001 * lat*lat + 1.426927733 * lon - 3.710854995 * lat + 246.7869373;
+            if (X < 0)
+                X = 0;
+            else if (X > 59)
+                X = 59;
+            if (Y < 0)
+                Y = 0;
+            else if (Y > 83)
+                Y = 83;
+            return new Location( 17 + ((int)Math.Round(X))* 7, 17 + ((int)Math.Round(Y)) * 7);
         }
 
         public static bool operator ==(Location f1, Location f2)
@@ -120,7 +141,7 @@ namespace Meteo
             public static Location Torun { get { return new Location("Toruń", 209, 383); } }
             public static Location Warszawa { get { return new Location("Warszawa", 250, 406); } }
             public static Location Wroclaw { get { return new Location("Wrocław", 181, 436); } }
-            public static Location ZielonaGora { get { return new Location("Zielona Góra", 155, 412); } }
+            public static Location ZielataGora { get { return new Location("Zielata Góra", 155, 412); } }
         }
 
         public static readonly int[] AllowedX = { 285, 199, 210, 152, 215, 244, 232, 277, 223, 240,196,180,269,142,209,250,181,155 };

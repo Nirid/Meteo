@@ -46,6 +46,10 @@ namespace Meteo
             SetLegendaSource();
             SetWeatherSource();
 
+
+            var test = Location.GPSToLocation(new System.Device.Location.GeoCoordinate(60, 15));
+            int x = test.X;
+            int y = test.Y;
             
         }
 

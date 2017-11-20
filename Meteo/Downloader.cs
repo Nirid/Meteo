@@ -17,14 +17,15 @@ namespace Meteo
 
             DateTime date = DateTime.Now;
             if (date.Hour < 6)
-                WeatherDate = DateTime.Today.AddHours(-6);
+                WeatherDate = DateTime.Today.AddHours(-12);
             else if (date.Hour < 12)
-                WeatherDate = DateTime.Today;
+                WeatherDate = DateTime.Today.AddHours(-6);
             else if (date.Hour < 18)
-                WeatherDate = DateTime.Today.AddHours(6);
+                WeatherDate = DateTime.Today;
             else
-                WeatherDate = DateTime.Today.AddHours(12);
+                WeatherDate = DateTime.Today.AddHours(6);
 
+            CurrentWeatherDate = WeatherDate;
             DownloadLegend();
 
             RefreshImage();
@@ -44,7 +45,14 @@ namespace Meteo
             {
                 using (var client = new WebClient())
                 {
-                    client.DownloadFile($"http://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&fdate={DateString}&row={Location.Y}&col={Location.X}&lang=pl", FullNameWeather);
+                    try
+                    {
+                        client.DownloadFile($"http://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&fdate={DateString}&row={Location.Y}&col={Location.X}&lang=pl", FullNameWeather);
+                    }catch(System.Net.WebException Ex)
+                    {
+                        //TODO: Enter offline mode
+                        Logging.Log(Ex.ToString());
+                    }
                 }
             }
         }
@@ -55,8 +63,15 @@ namespace Meteo
             {
                 using (var client = new WebClient())
                 {
-                    client.DownloadFile("http://www.meteo.pl/um/metco/leg_um_pl_cbase_256.png", FullNameLegenda);
-                }
+                    try
+                    { 
+                        client.DownloadFile("http://www.meteo.pl/um/metco/leg_um_pl_cbase_256.png", FullNameLegenda);
+                    }catch (System.Net.WebException Ex)
+                    {
+                        //TODO: Enter offline mode
+                        Logging.Log(Ex.ToString());
+                    }
+            }
             }
             var info = new FileInfo($"{Path}\\Legenda.png");
             if (info.Length < (5 * 10 ^ 3))
@@ -141,7 +156,7 @@ namespace Meteo
                               select $"{Path}\\Date{date.ToString("yyyyMMddHH")}X{data.Key.X}Y{data.Key.Y}.png";
 
             var list = NewestFiles.ToList();
-            //Remove only meteograms, leave everything else alone
+            //Remove only meteograms, leave everything else alate
             foreach (var file in Directory.GetFiles(Path))
             {
                 if (list.Contains(file) || file == FullNameLegenda || file == Path+"\\settings.xml")
@@ -158,6 +173,7 @@ namespace Meteo
                     }
                     catch (IOException Ex)
                     {
+                        Logging.Log(Ex.ToString());
                         continue;
                     }
                 }
