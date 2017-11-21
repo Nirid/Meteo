@@ -9,13 +9,24 @@ namespace Meteo
 {
     class Location
     {
-        public string Name;
+        public string Name = "";
         public int Y;
         public int X;
+        public bool Update = false;
+
+        public Location(string Name, int X, int Y, bool Update) :this(Name,X,Y)
+        {
+            this.Update = Update;
+        }
 
         public Location(string Name, int X, int Y) : this(X, Y)
         {
             this.Name = Name;
+        }
+
+        public Location(int X, int Y, bool Update) : this(X,Y)
+        {
+            this.Update = Update;
         }
 
         public Location(int X, int Y )
@@ -30,7 +41,6 @@ namespace Meteo
                 this.X = X;
             else
                 throw new ArgumentOutOfRangeException("X must have allowed value");
-            Name = "";
         }
 
         public static (int X,int Y) SnapToGrid(int X,int Y)

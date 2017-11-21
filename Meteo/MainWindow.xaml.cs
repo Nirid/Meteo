@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace Meteo
 {
@@ -38,24 +39,21 @@ namespace Meteo
             Timer.Start();
 
             Manager = new XMLManager(FolderPath);
-            Locations = Manager.AllLocations.ToList();
+            Locations = new ObservableCollection<Location>(Manager.AllLocations.ToList());
             CityList.ItemsSource = Locations;
-            CityList.SelectedIndex = Locations.IndexOf(Manager.LastLocation);
-            Downloader.Location = (Location)CityList.SelectedItem;
+            int a = Locations.IndexOf(Manager.LastLocation);
+            CityList.SelectedIndex = a;
 
             SetLegendaSource();
             SetWeatherSource();
 
+            Locations.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(UpdateLocations);
 
-            var test = Location.GPSToLocation(new System.Device.Location.GeoCoordinate(60, 15));
-            int x = test.X;
-            int y = test.Y;
-            
         }
 
         public readonly string FolderPath;
         private XMLManager Manager;
-        private List<Location> Locations;
+        private ObservableCollection<Location> Locations;
         private Downloader Downloader;
         private System.Windows.Threading.DispatcherTimer Timer;
 
@@ -95,6 +93,7 @@ namespace Meteo
                 SetDefaultButton.IsEnabled = false;
             else
                 SetDefaultButton.IsEnabled = true;
+             AutoUpdateCheckbox.IsChecked = Downloader.Location.Update;
             ForceUpdate();
         }
 
@@ -159,11 +158,39 @@ namespace Meteo
                 if (!Manager.AllLocations.Contains(location))
                 {
                     Manager.AddLocation(location);
-                    Locations = Manager.AllLocations.ToList();
+                    Locations = new ObservableCollection<Location>( Manager.AllLocations.ToList());
                     CityList.ItemsSource = Locations;
                     CityList.SelectedItem = location;
                 }
             }
+        }
+
+        private void AutoUpdateCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            var loc = (Location)CityList.SelectedItem;
+            if (loc.Update == true)
+                return;
+            int index = Locations.IndexOf(loc);
+            var replaced = Locations[index];
+            Locations[index] = new Location(replaced.Name, replaced.X, replaced.Y, true);
+            CityList.SelectedIndex = Locations.IndexOf(loc);
+        }
+
+        private void AutoUpdateCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var loc = (Location)CityList.SelectedItem;
+            if (loc.Update == false)
+                return;
+            int index = Locations.IndexOf(loc);
+            var replaced = Locations[index];
+            Locations[index] = new Location(replaced.Name, replaced.X, replaced.Y, false);
+            CityList.SelectedIndex = Locations.IndexOf(loc);
+        }
+
+        public void UpdateLocations(object Sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            Logging.Log(Sender.GetType().ToString() + " | " + e.Action.ToString());
+            Manager.UpdateLocations(Locations);
         }
     }
 }

@@ -31,6 +31,7 @@ namespace Meteo
             RefreshImage();
         }
 
+        public bool OfflineMode { get; private set; }
         public DateTime WeatherDate { get; private set; }
         private DateTime CurrentWeatherDate;
         public string DateString { get { return WeatherDate.ToString("yyyyMMddHH"); } }
