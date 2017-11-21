@@ -38,11 +38,16 @@ namespace Meteo
             Timer.Interval = new TimeSpan(1, 0, 0);
             Timer.Start();
 
-            Manager = new XMLManager(FolderPath);
-            Locations = new ObservableCollection<Location>(Manager.AllLocations.ToList());
+            FManager = new FolderManager(FolderPath);
+
+            XManager = new XMLManager(FolderPath);
+            Locations = new ObservableCollection<Location>(XManager.AllLocations.ToList());
             CityList.ItemsSource = Locations;
-            int a = Locations.IndexOf(Manager.LastLocation);
+            int a = Locations.IndexOf(XManager.LastLocation);
             CityList.SelectedIndex = a;
+
+            ToBeUpdated = XManager.AllLocations.Where(x => x.Update == true && x != XManager.LastLocation).ToList();
+            ToBeUpdated.Insert(0, XManager.LastLocation);
 
             SetLegendaSource();
             SetWeatherSource();
@@ -52,10 +57,12 @@ namespace Meteo
         }
 
         public readonly string FolderPath;
-        private XMLManager Manager;
+        private XMLManager XManager;
+        private FolderManager FManager;
         private ObservableCollection<Location> Locations;
         private Downloader Downloader;
         private System.Windows.Threading.DispatcherTimer Timer;
+        private List<Location> ToBeUpdated;
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
@@ -89,7 +96,7 @@ namespace Meteo
                 return;
             }
             Downloader.Location = (Location)CityList.SelectedItem;
-            if (Manager.LastLocation == Downloader.Location)
+            if (XManager.LastLocation == Downloader.Location)
                 SetDefaultButton.IsEnabled = false;
             else
                 SetDefaultButton.IsEnabled = true;
@@ -144,7 +151,7 @@ namespace Meteo
 
         private void SetDefaultButton_Click(object sender, RoutedEventArgs e)
         {
-            Manager.SetLastLocation((Location)CityList.SelectedItem);
+            XManager.SetLastLocation((Location)CityList.SelectedItem);
             SetDefaultButton.IsEnabled = false;
         }
 
@@ -155,10 +162,10 @@ namespace Meteo
             {
                 var loc = Location.SnapToGrid(X, Y);
                 var location = new Location(name, loc.X, loc.Y);
-                if (!Manager.AllLocations.Contains(location))
+                if (!XManager.AllLocations.Contains(location))
                 {
-                    Manager.AddLocation(location);
-                    Locations = new ObservableCollection<Location>( Manager.AllLocations.ToList());
+                    XManager.AddLocation(location);
+                    Locations = new ObservableCollection<Location>( XManager.AllLocations.ToList());
                     CityList.ItemsSource = Locations;
                     CityList.SelectedItem = location;
                 }
@@ -190,7 +197,7 @@ namespace Meteo
         public void UpdateLocations(object Sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             Logging.Log(Sender.GetType().ToString() + " | " + e.Action.ToString());
-            Manager.UpdateLocations(Locations);
+            XManager.UpdateLocations(Locations);
         }
     }
 }
