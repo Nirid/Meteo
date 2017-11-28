@@ -151,7 +151,7 @@ namespace Meteo
             public static Location Torun { get { return new Location("Toruń", 209, 383); } }
             public static Location Warszawa { get { return new Location("Warszawa", 250, 406); } }
             public static Location Wroclaw { get { return new Location("Wrocław", 181, 436); } }
-            public static Location ZielataGora { get { return new Location("Zielata Góra", 155, 412); } }
+            public static Location ZielonaGora { get { return new Location("Zielona Góra", 155, 412); } }
         }
 
         public static readonly int[] AllowedX = { 285, 199, 210, 152, 215, 244, 232, 277, 223, 240,196,180,269,142,209,250,181,155 };

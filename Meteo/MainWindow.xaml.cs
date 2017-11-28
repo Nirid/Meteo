@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace Meteo
 {
@@ -31,173 +32,126 @@ namespace Meteo
             System.IO.Directory.CreateDirectory(System.IO.Path.GetTempPath() + "Weather");
             FolderPath = System.IO.Path.GetTempPath() + "Weather";
 
-            Downloader = new Downloader(FolderPath);
-
-            Timer = new System.Windows.Threading.DispatcherTimer();
-            Timer.Tick += dispatcherTimer_Tick;
-            Timer.Interval = new TimeSpan(1, 0, 0);
-            Timer.Start();
-
-            FManager = new FolderManager(FolderPath);
-
+            Handler = new FileHandler(FolderPath);
             XManager = new XMLManager(FolderPath);
+            LegendHandler = new LegendHandler(FolderPath);
+
+            Files = FileHandler.FileList;
+            NewestWeatherDate = XManager.ReadLastUpdateDate();
+            FileHandler.CheckNewestWeather(XManager.LastLocation, NewestWeatherDate);
+
             Locations = new ObservableCollection<Location>(XManager.AllLocations.ToList());
             CityList.ItemsSource = Locations;
-            int a = Locations.IndexOf(XManager.LastLocation);
-            CityList.SelectedIndex = a;
+            SelectedLocation = XManager.LastLocation;
+            CityList.SelectedIndex = Locations.IndexOf(SelectedLocation);
+            Locations.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(OnUpdateLocations);
+            SetWeatherSource(Files.Where(x=>x.Location == SelectedLocation && x.Status == FileSet.DownloadStatus.Downloaded).OrderByDescending(x=>x.Date).FirstOrDefault());
 
-            ToBeUpdated = XManager.AllLocations.Where(x => x.Update == true && x != XManager.LastLocation).ToList();
-            ToBeUpdated.Insert(0, XManager.LastLocation);
+            FileHandler.WeatherFileDownloaded += OnWeatherFileDownloaded;
 
-            SetLegendaSource();
-            SetWeatherSource();
+            LegendHandler.LegendDownloaded += OnLegendDownloaded;
+            if (!LegendHandler.CheckForLegendInFolder(FolderPath))
+                LegendHandler.DownloadAndSaveLegend();
+            else
+                SetLegendSource();
 
-            Locations.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(UpdateLocations);
+            UpdateTimer = new System.Windows.Threading.DispatcherTimer();
+            UpdateTimer.Tick += UpdateDispatcherTimer_Tick;
+            UpdateTimer.Interval = new TimeSpan(1, 0, 0);
+            UpdateTimer.Start();
 
+            CleanupTimer = new System.Windows.Threading.DispatcherTimer();
+            CleanupTimer.Tick += CleanupDispatcherTimer_Tick;
+            CleanupTimer.Interval = new TimeSpan(0, 17, 1);
+            CleanupTimer.Start();
         }
 
         public readonly string FolderPath;
         private XMLManager XManager;
-        private FolderManager FManager;
+        private FileHandler Handler;
+        private LegendHandler LegendHandler;
         private ObservableCollection<Location> Locations;
-        private Downloader Downloader;
-        private System.Windows.Threading.DispatcherTimer Timer;
-        private List<Location> ToBeUpdated;
+        private System.Windows.Threading.DispatcherTimer UpdateTimer;
+        private System.Windows.Threading.DispatcherTimer CleanupTimer;
+        private DateTime NewestWeatherDate;
+        private Location SelectedLocation;
+        private FileSet Displayed;
+        private ObservableCollection<FileSet> Files;
+        private object SyncObject = new object();
+        private object SyncObject2 = new object();
 
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        private void UpdateDispatcherTimer_Tick(object sender, EventArgs e)
         {
-            Downloader.FindNewestWeather();
-            SetWeatherSource();
+            FileHandler.CheckNewestWeather(SelectedLocation, NewestWeatherDate);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void CleanupDispatcherTimer_Tick(object sender, EventArgs e)
         {
-            ForceUpdate();
+            FileHandler.RemoveOutdatedFiles(FolderPath);
         }
 
-        private void SetWeatherSource()
+        private void SetWeatherSource(FileSet set)
         {
-            var uriWeather = new Uri(Downloader.FullNameWeather);
-            var uriWeatherLocal = new Uri(uriWeather.LocalPath);
-            WeatherImage.Source = new BitmapImage(uriWeatherLocal);
-        }
-
-        private void SetLegendaSource()
-        {
-            var uriLegenda = new Uri(Downloader.FullNameLegenda);
-            var uriLegendaLocal = new Uri(uriLegenda.LocalPath);
-            LegendaImage.Source = new BitmapImage(uriLegendaLocal);
-        }
-
-        private void CityList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if(CityList.SelectedIndex < 0 || CityList.SelectedIndex >= CityList.Items.Count)
+            lock (SyncObject2)
             {
-                return;
+                if ((set != null && set.Status == FileSet.DownloadStatus.Downloaded) && ((Displayed == null) || (Displayed != null && ((Displayed.Location == SelectedLocation && set.Date > Displayed.Date) || (Displayed.Location != SelectedLocation)))))
+                {
+                    if (Displayed != null)
+                        Displayed.Status = FileSet.DownloadStatus.Downloaded;
+                    set.Status = FileSet.DownloadStatus.IsDisplayed;
+                    Displayed = set;
+                    var uriWeather = new Uri(FileHandler.GetFilename(set));
+                    var uriWeatherLocal = new Uri(uriWeather.LocalPath);
+                    var Bitmap = new BitmapImage(uriWeatherLocal);
+                    WeatherImage.Source = Bitmap;
+                }
             }
-            Downloader.Location = (Location)CityList.SelectedItem;
-            if (XManager.LastLocation == Downloader.Location)
-                SetDefaultButton.IsEnabled = false;
-            else
-                SetDefaultButton.IsEnabled = true;
-             AutoUpdateCheckbox.IsChecked = Downloader.Location.Update;
-            ForceUpdate();
+        }
+
+        private void SetLegendSource()
+        {
+            var uriLegend = new Uri(LegendHandler.LegendPath);
+            var uriLegendLocal = new Uri(uriLegend.LocalPath);
+            LegendaImage.Source = new BitmapImage(uriLegendLocal);
         }
 
         private void ForceUpdate()
         {
-            dispatcherTimer_Tick(this, null);
-            Timer.Stop();
-            Timer.Start();
+            UpdateDispatcherTimer_Tick(this, null);
+            UpdateTimer.Stop();
+            UpdateTimer.Start();
             UpdateTextbox();
         }
 
-        private void ManualMode_Checked(object sender, RoutedEventArgs e)
-        {
-            YTextbox.IsEnabled = true;
-            XTextbox.IsEnabled = true;
-            SaveNewLocalizationButton.IsEnabled = true;
-            SetLocalizationButton.IsEnabled = true;
-            NewLocalizationNameTextbox.IsEnabled = true;
-        }
-
-        private void ManualMode_Unchecked(object sender, RoutedEventArgs e)
-        {
-            YTextbox.IsEnabled = false;
-            XTextbox.IsEnabled = false;
-            SaveNewLocalizationButton.IsEnabled = false;
-            SetLocalizationButton.IsEnabled = false;
-            NewLocalizationNameTextbox.IsEnabled = false;
-        }
-
-        private void UpdateTextbox()
-        {
-            XTextbox.Text = Downloader.Location.X.ToString();
-            YTextbox.Text = Downloader.Location.Y.ToString();
-        }
-
-        private void SetLocalizationButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (ManualMode.IsChecked.Value)
-            {
-                if (int.TryParse(YTextbox.Text, out var Y) && int.TryParse(XTextbox.Text, out var X))
-                {
-                    var loc = Location.SnapToGrid(X, Y);
-                    Downloader.Location = new Location(loc.X,loc.Y);
-                    ForceUpdate();
-                }
-            }
-        }
-
-        private void SetDefaultButton_Click(object sender, RoutedEventArgs e)
-        {
-            XManager.SetLastLocation((Location)CityList.SelectedItem);
-            SetDefaultButton.IsEnabled = false;
-        }
-
-        private void SaveNewLocalizationButton_Click(object sender, RoutedEventArgs e)
-        {
-            string name = NewLocalizationNameTextbox.Text;
-            if(int.TryParse(YTextbox.Text, out var Y) && int.TryParse(XTextbox.Text, out var X))
-            {
-                var loc = Location.SnapToGrid(X, Y);
-                var location = new Location(name, loc.X, loc.Y);
-                if (!XManager.AllLocations.Contains(location))
-                {
-                    XManager.AddLocation(location);
-                    Locations = new ObservableCollection<Location>( XManager.AllLocations.ToList());
-                    CityList.ItemsSource = Locations;
-                    CityList.SelectedItem = location;
-                }
-            }
-        }
-
-        private void AutoUpdateCheckbox_Checked(object sender, RoutedEventArgs e)
-        {
-            var loc = (Location)CityList.SelectedItem;
-            if (loc.Update == true)
-                return;
-            int index = Locations.IndexOf(loc);
-            var replaced = Locations[index];
-            Locations[index] = new Location(replaced.Name, replaced.X, replaced.Y, true);
-            CityList.SelectedIndex = Locations.IndexOf(loc);
-        }
-
-        private void AutoUpdateCheckbox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            var loc = (Location)CityList.SelectedItem;
-            if (loc.Update == false)
-                return;
-            int index = Locations.IndexOf(loc);
-            var replaced = Locations[index];
-            Locations[index] = new Location(replaced.Name, replaced.X, replaced.Y, false);
-            CityList.SelectedIndex = Locations.IndexOf(loc);
-        }
-
-        public void UpdateLocations(object Sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void OnUpdateLocations(object Sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             Logging.Log(Sender.GetType().ToString() + " | " + e.Action.ToString());
             XManager.UpdateLocations(Locations);
+        }
+
+        private void OnWeatherFileDownloaded(object sender, EventArgs e)
+        {
+            lock (SyncObject)
+            {
+                var set = (FileSet)sender;
+                if (set.Status == FileSet.DownloadStatus.Downloaded)
+                {
+                    if (set.Date > NewestWeatherDate)
+                    {
+                        NewestWeatherDate = set.Date;
+                        XManager.UpdateLastWeatherUpdateDate(set.Date);
+                    }
+                    if (set.Location == SelectedLocation && (Displayed != null && ((Displayed.Location != SelectedLocation) || (Displayed.Location == SelectedLocation && set.Date > Displayed.Date)) || Displayed == null))
+                    {
+                        SetWeatherSource(set);
+                    }
+                }
+            }
+        }
+
+        private void OnLegendDownloaded(object sender, EventArgs e)
+        {
+            SetLegendSource();
         }
     }
 }

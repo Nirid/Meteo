@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.IO;
 using System.Xml.Linq;
+using System.Globalization;
 
 namespace Meteo
 {
@@ -34,7 +35,8 @@ namespace Meteo
         private readonly string Path;
         private XDocument Doc;
         public Dictionary<Location, DateTime> SavedLocations;
-        List<Location> DefaultLocations = new List<Location>() { Location.Cities.Bialystok, Location.Cities.Bydgoszcz, Location.Cities.Gdansk, Location.Cities.GorzowWielkoposki, Location.Cities.Katowice, Location.Cities.Kielce, Location.Cities.Krakow, Location.Cities.Lodz, Location.Cities.Lublin, Location.Cities.Olsztyn, Location.Cities.Opole, Location.Cities.Poznan, Location.Cities.Rzeszow, Location.Cities.Szczecin, Location.Cities.Torun, Location.Cities.Warszawa, Location.Cities.Wroclaw, Location.Cities.ZielataGora };
+        private static CultureInfo IC = CultureInfo.InvariantCulture;
+        List<Location> DefaultLocations = new List<Location>() { Location.Cities.Bialystok, Location.Cities.Bydgoszcz, Location.Cities.Gdansk, Location.Cities.GorzowWielkoposki, Location.Cities.Katowice, Location.Cities.Kielce, Location.Cities.Krakow, Location.Cities.Lodz, Location.Cities.Lublin, Location.Cities.Olsztyn, Location.Cities.Opole, Location.Cities.Poznan, Location.Cities.Rzeszow, Location.Cities.Szczecin, Location.Cities.Torun, Location.Cities.Warszawa, Location.Cities.Wroclaw, Location.Cities.ZielonaGora };
         public IEnumerable<Location> AllLocations => Doc.Descendants("Location").Select(x => XElementToLocation(x));
         public Location LastLocation => Doc.Descendants("LastLocation").Select(x => XElementToLocation(x)).Single();
         
@@ -44,7 +46,8 @@ namespace Meteo
                 new XElement("Settings",
                 new XElement("LastLocation",
                 new XElement("X", "180"),
-                new XElement("Y", "400"))),
+                new XElement("Y", "400")),
+                new XElement("LastUpdateDate", DateTime.MinValue.ToString(IC))),
                 new XElement("Locations",
                 DefaultLocations.Select(x => LocationToXlement(x)))));
             Doc.Declaration = new XDeclaration("1.0", "UTF-8", null);
@@ -61,7 +64,6 @@ namespace Meteo
             return true;
         }
 
-
         public void UpdateLocations(IEnumerable<Location> locations)
         {
             Logging.Log("Locations Updataed");
@@ -72,8 +74,8 @@ namespace Meteo
         public void SetLastLocation(Location location)
         {
             var target = Doc.Descendants("LastLocation").Single();
-            target.Element("X").Value = location.X.ToString();
-            target.Element("Y").Value = location.Y.ToString();
+            target.Element("X").Value = location.X.ToString(IC);
+            target.Element("Y").Value = location.Y.ToString(IC);
             Doc.Save(Path);
         }
 
@@ -81,18 +83,18 @@ namespace Meteo
         {
             return new XElement("Location",
                 new XElement("Name",location.Name),
-                new XElement("X", location.X.ToString()),
-                new XElement("Y", location.Y.ToString()),
-                new XElement("Update", location.Update.ToString())
+                new XElement("X", location.X.ToString(IC)),
+                new XElement("Y", location.Y.ToString(IC)),
+                new XElement("Update", location.Update.ToString(IC))
                 );
         }
 
         private static Location XElementToLocation(XElement element)
         {
             string Name = element.Element("Name")?.Value ?? "";
-            int X = Convert.ToInt32(element.Element("X").Value);
-            int Y = Convert.ToInt32(element.Element("Y").Value);
-            bool Update = Convert.ToBoolean(element.Element("Update")?.Value ?? "False");
+            int X = Convert.ToInt32(element.Element("X").Value,IC);
+            int Y = Convert.ToInt32(element.Element("Y").Value,IC);
+            bool Update = Convert.ToBoolean(element.Element("Update")?.Value ?? "False",IC);
             return new Location(Name, X, Y,Update);
         }
 
@@ -102,7 +104,18 @@ namespace Meteo
                 locations.Select(x => LocationToXlement(x)));
         }
         
+        public void UpdateLastWeatherUpdateDate(DateTime date)
+        {
+            var target = Doc.Descendants("LastUpdateDate").Single();
+            target.Value = date.ToString(CultureInfo.InvariantCulture);
+            Doc.Save(Path);
+        }
 
+        public DateTime ReadLastUpdateDate()
+        {
+            var target = Doc.Descendants("LastUpdateDate").Single();
+            return Convert.ToDateTime(target.Value, IC);
+        }
         
     }
 }
