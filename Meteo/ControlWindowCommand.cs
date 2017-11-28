@@ -18,6 +18,7 @@ namespace Meteo
                 }else
                 {
                     win.Visibility = Visibility.Visible;
+                    win.Activate();
                 }
             }
         }

@@ -14,7 +14,7 @@ namespace Meteo
         public int X;
         public bool Update = false;
 
-        public Location(string Name, int X, int Y, bool Update) :this(Name,X,Y)
+        public Location(string Name, int X, int Y, bool Update) : this(Name,X,Y)
         {
             this.Update = Update;
         }

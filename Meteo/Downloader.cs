@@ -34,7 +34,7 @@ namespace Meteo
             {
                 try
                 {
-                    await Task.Run(() => { client.DownloadFileTaskAsync("http://www.meteo.pl/um/metco/leg_um_pl_cbase_256.png", path); });
+                    await client.DownloadFileTaskAsync("http://www.meteo.pl/um/metco/leg_um_pl_cbase_256.png", path);
                     return true;
                 }
                 catch (System.Net.WebException Ex)

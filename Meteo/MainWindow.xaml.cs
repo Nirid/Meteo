@@ -45,6 +45,9 @@ namespace Meteo
             SelectedLocation = XManager.LastLocation;
             CityList.SelectedIndex = Locations.IndexOf(SelectedLocation);
             Locations.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(OnUpdateLocations);
+
+            if (Files.Where(x => x.Location == SelectedLocation && x.Date == NewestWeatherDate).Count() == 0)
+                Files.Add(new FileSet(SelectedLocation, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
             SetWeatherSource(Files.Where(x=>x.Location == SelectedLocation && x.Status == FileSet.DownloadStatus.Downloaded).OrderByDescending(x=>x.Date).FirstOrDefault());
 
             FileHandler.WeatherFileDownloaded += OnWeatherFileDownloaded;
@@ -103,7 +106,8 @@ namespace Meteo
                     var uriWeather = new Uri(FileHandler.GetFilename(set));
                     var uriWeatherLocal = new Uri(uriWeather.LocalPath);
                     var Bitmap = new BitmapImage(uriWeatherLocal);
-                    WeatherImage.Source = Bitmap;
+                    Bitmap.Freeze();
+                    WeatherImage.Dispatcher.BeginInvoke(new Action(() => WeatherImage.Source = Bitmap));
                 }
             }
         }
@@ -120,7 +124,38 @@ namespace Meteo
             UpdateDispatcherTimer_Tick(this, null);
             UpdateTimer.Stop();
             UpdateTimer.Start();
+        }
+
+        private void SelectedLocationChanged()
+        {
+            var other = Files.Where(x => x.Location == SelectedLocation && (x.Status == FileSet.DownloadStatus.Downloaded || x.Status == FileSet.DownloadStatus.IsDisplayed)).OrderByDescending(x => x.Date).ToList();
+            if (other.Count == 0)
+            {
+                Files.Add(new FileSet(SelectedLocation, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
+                return;
+            } else
+            {
+                var first = other.First();
+                if(first.Date < NewestWeatherDate)
+                {
+                    Files.Add(new FileSet(SelectedLocation, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
+                }
+                SetWeatherSource(first);
+            }
             UpdateTextbox();
+        }
+
+        private void NewestWeatherDateChanged()
+        {
+            var Updateable = from file in Files
+                             where (file.Location.Update == true) || (file.Location == SelectedLocation)
+                             group file by file.Location into set
+                             let first = set.OrderByDescending(x => x.Date).First()
+                             where first.Date < NewestWeatherDate
+                             select set.Where(x => x == first).Single();
+
+            foreach (var set in Updateable)
+                Files.Add(new FileSet(set.Location, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
         }
 
         private void OnUpdateLocations(object Sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -140,6 +175,7 @@ namespace Meteo
                     {
                         NewestWeatherDate = set.Date;
                         XManager.UpdateLastWeatherUpdateDate(set.Date);
+                        NewestWeatherDateChanged();
                     }
                     if (set.Location == SelectedLocation && (Displayed != null && ((Displayed.Location != SelectedLocation) || (Displayed.Location == SelectedLocation && set.Date > Displayed.Date)) || Displayed == null))
                     {

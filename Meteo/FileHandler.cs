@@ -95,10 +95,7 @@ namespace Meteo
                     {
                         foreach (FileSet set in args.OldItems)
                         {
-                            if (set.Status == FileSet.DownloadStatus.ToBeDeleted)
-                                return;
-                            else
-                                throw new InvalidOperationException();
+                            File.Delete(GetFilename(set));
                         }
                     }
                     else
@@ -116,7 +113,7 @@ namespace Meteo
                     }
                     else if (set.Status == FileSet.DownloadStatus.ToBeDeleted)
                     {
-                        //File.Delete(GetFilename(set));
+                        FileList.Remove(set);
                         return;
                     }
                     else if (set.Status == FileSet.DownloadStatus.IsDisplayed && previousStatus == FileSet.DownloadStatus.Downloaded)

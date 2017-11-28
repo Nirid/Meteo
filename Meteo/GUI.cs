@@ -23,6 +23,7 @@ namespace Meteo
             SaveNewLocalizationButton.IsEnabled = true;
             SetLocalizationButton.IsEnabled = true;
             NewLocalizationNameTextbox.IsEnabled = true;
+            UpdateTextbox();
         }
 
         private void ManualMode_Unchecked(object sender, RoutedEventArgs e)
@@ -36,8 +37,11 @@ namespace Meteo
 
         private void UpdateTextbox()
         {
-            XTextbox.Text = SelectedLocation.X.ToString();
-            YTextbox.Text = SelectedLocation.Y.ToString();
+            if (ManualMode.IsChecked == true)
+            {
+                XTextbox.Text = SelectedLocation.X.ToString();
+                YTextbox.Text = SelectedLocation.Y.ToString();
+            }
         }
 
         private void SetLocalizationButton_Click(object sender, RoutedEventArgs e)
@@ -47,9 +51,8 @@ namespace Meteo
                 if (int.TryParse(YTextbox.Text, out var Y) && int.TryParse(XTextbox.Text, out var X))
                 {
                     var loc = Location.SnapToGrid(X, Y);
-                    var set = new FileSet(new Location(loc.X,loc.Y), NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded);
-                    Files.Add(set);
-                    SelectedLocation = set.Location;
+                    SelectedLocation = new Location(loc.X, loc.Y);
+                    SelectedLocationChanged();
                 }
             }
         }
@@ -111,9 +114,8 @@ namespace Meteo
             else
                 SetDefaultButton.IsEnabled = true;
             AutoUpdateCheckbox.IsChecked = SelectedLocation.Update;
-            if (Files.FirstOrDefault(x => x.Location == SelectedLocation) == null)
-                Files.Add(new FileSet(SelectedLocation, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
-            SetWeatherSource(Files.Where(x=>x.Location == SelectedLocation && x.Status == FileSet.DownloadStatus.Downloaded).OrderByDescending(x=>x.Date).FirstOrDefault());
+
+            SelectedLocationChanged();
         }
 
     }
