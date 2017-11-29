@@ -100,7 +100,13 @@ namespace Meteo
                     {
                         foreach (FileSet set in args.OldItems)
                         {
-                            File.Delete(GetFilename(set));
+                            try
+                            {
+                                File.Delete(GetFilename(set));
+                            }catch(IOException Ex)
+                            {
+                                Logging.Log(Ex.ToString());
+                            }
                         }
                     }
                     else

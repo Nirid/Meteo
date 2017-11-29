@@ -66,7 +66,7 @@ namespace Meteo
 
             CleanupTimer = new System.Windows.Threading.DispatcherTimer();
             CleanupTimer.Tick += CleanupDispatcherTimer_Tick;
-            CleanupTimer.Interval = new TimeSpan(0, 7, 1);
+            CleanupTimer.Interval = new TimeSpan(0, 0, 5);
             CleanupTimer.Start();
 
             NoInternetTimer = new System.Windows.Threading.DispatcherTimer();

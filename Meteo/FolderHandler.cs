@@ -50,10 +50,10 @@ namespace Meteo
         {
             foreach (var file in GetOutdatedAndDamagedFiles(path))
             {
-                if (FileList.Contains(file))
+                var set = FileList.Where(x => x == file);
+                if (set.Count() != 0)
                 {
-                    file.Status = FileSet.DownloadStatus.ToBeDeleted;
-                    return;
+                    set.Single().Status = FileSet.DownloadStatus.ToBeDeleted;
                 }
                 else
                 {
