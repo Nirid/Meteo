@@ -36,7 +36,6 @@ namespace Meteo
         private XDocument Doc;
         public Dictionary<Location, DateTime> SavedLocations;
         private static CultureInfo IC = CultureInfo.InvariantCulture;
-        List<Location> DefaultLocations = new List<Location>() { Location.Cities.Bialystok, Location.Cities.Bydgoszcz, Location.Cities.Gdansk, Location.Cities.GorzowWielkoposki, Location.Cities.Katowice, Location.Cities.Kielce, Location.Cities.Krakow, Location.Cities.Lodz, Location.Cities.Lublin, Location.Cities.Olsztyn, Location.Cities.Opole, Location.Cities.Poznan, Location.Cities.Rzeszow, Location.Cities.Szczecin, Location.Cities.Torun, Location.Cities.Warszawa, Location.Cities.Wroclaw, Location.Cities.ZielonaGora };
         public IEnumerable<Location> AllLocations => Doc.Descendants("Location").Select(x => XElementToLocation(x));
         public Location LastLocation => Doc.Descendants("LastLocation").Select(x => XElementToLocation(x)).Single();
         
@@ -49,7 +48,7 @@ namespace Meteo
                 new XElement("Y", "400")),
                 new XElement("LastUpdateDate", DateTime.MinValue.ToString(IC))),
                 new XElement("Locations",
-                DefaultLocations.Select(x => LocationToXlement(x)))));
+                Location.Cities.AllCities.Select(x => LocationToXlement(x)))));
             Doc.Declaration = new XDeclaration("1.0", "UTF-8", null);
             Doc.Save(Path);
         }

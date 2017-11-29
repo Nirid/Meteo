@@ -30,7 +30,6 @@ namespace Meteo
             var duplicates = from data in allData
                              group data.Date by data.Location into all
                              select (all.Key, all.OrderByDescending(x => x).Skip(1)) into zipped
-                             let key = zipped.Key
                              from date in zipped.Item2
                              select new FileSet(zipped.Key, date, FileSet.DownloadStatus.Downloaded);
 
@@ -41,7 +40,7 @@ namespace Meteo
             var tooSmall = from file in Directory.GetFiles(Path)
                            let data = GetLocationAndDate(file)
                            where data != null && data.Value.location != null
-                           where new FileInfo(file).Length < 10000
+                           where new FileInfo(file).Length < 100000
                            select new FileSet(data.Value.location, data.Value.date, FileSet.DownloadStatus.Downloaded);
 
             return duplicates.Concat(outdated.Concat(tooSmall)).ToList();
@@ -49,15 +48,23 @@ namespace Meteo
 
         public static void RemoveOutdatedFiles(string path)
         {
-            foreach (var file in GetOutdatedAndDamagedFiles(path).Select(x => GetFilename(x)))
+            foreach (var file in GetOutdatedAndDamagedFiles(path))
             {
-                try
+                if (FileList.Contains(file))
                 {
-                    File.Delete(file);
+                    file.Status = FileSet.DownloadStatus.ToBeDeleted;
+                    return;
                 }
-                catch (IOException Ex)
+                else
                 {
-                    Logging.Log(Ex.ToString());
+                    try
+                    {
+                        File.Delete(GetFilename(file));
+                    }
+                    catch (IOException Ex)
+                    {
+                        Logging.Log(Ex.ToString());
+                    }
                 }
             }
 

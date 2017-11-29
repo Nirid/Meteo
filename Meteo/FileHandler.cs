@@ -18,6 +18,8 @@ namespace Meteo
             Path = path;
             FileList.CollectionChanged += OnFileListCollectionchanged;
             FileList.ItemPropertyChanged += OnItemPropertyChanged;
+            InternetConnection += OnInternetConnection;
+            NoInternetConnection += OnNoInternetConnection;
             foreach(var set in CheckFolder(Path))
             {
                 FileList.Add(set);
@@ -29,6 +31,9 @@ namespace Meteo
         private static readonly CultureInfo IC = CultureInfo.InvariantCulture;
         public static CustomObservableCollection<FileSet> FileList = new CustomObservableCollection<FileSet>();
         private static readonly object SyncObject = new object();
+        public static event EventHandler NoInternetConnection;
+        public static event EventHandler InternetConnection;
+        public static bool IsInternetConnection = true;
 
         public static string GetName(Location location, DateTime date) => $"Date{date.ToString("yyyy-MM-dd-HH", IC)} X{location.X.ToString(IC)} Y{location.Y.ToString(IC)} .png";
         public static string GetName(FileSet set) => GetName(set.Location, set.Date);
@@ -109,6 +114,7 @@ namespace Meteo
                     if (set.Status == FileSet.DownloadStatus.Downloaded && previousStatus == FileSet.DownloadStatus.ToBeDownloaded)
                     {
                         WeatherFileDownloaded(set, EventArgs.Empty);
+                        InternetConnection(set, EventArgs.Empty);
                         return;
                     }
                     else if (set.Status == FileSet.DownloadStatus.ToBeDeleted)
@@ -127,12 +133,19 @@ namespace Meteo
                     else if (set.Status == FileSet.DownloadStatus.DownloadFailed && previousStatus == FileSet.DownloadStatus.ToBeDownloaded)
                     {
                         WeatherFileDownloaded(set, EventArgs.Empty);
+                        NoInternetConnection(set, EventArgs.Empty);
                         return;
                     }
                     else if (set.Status == FileSet.DownloadStatus.NoWeatherFile && previousStatus == FileSet.DownloadStatus.ToBeDownloaded)
                     {
                         WeatherFileDownloaded(set, EventArgs.Empty);
+                        InternetConnection(set, EventArgs.Empty);
                         set.Status = FileSet.DownloadStatus.ToBeDeleted;
+                        return;
+                    }else if (set.Status == FileSet.DownloadStatus.ToBeDownloaded && previousStatus == FileSet.DownloadStatus.DownloadFailed)
+                    {
+                        var task = new Task<bool>(() => { return DownloadAndVerify(set).Result; });
+                        task.Start();
                         return;
                     }
                     else
@@ -200,6 +213,20 @@ namespace Meteo
                 else
                     throw new InvalidOperationException();
             }
+        }
+
+        private static void OnInternetConnection(object sendet, EventArgs e)
+        {
+            IsInternetConnection = true;
+            foreach(var file in FileList.Where(x=>x.Status == FileSet.DownloadStatus.DownloadFailed))
+            {
+                file.Status = FileSet.DownloadStatus.ToBeDownloaded;
+            }
+        }
+
+        private static void OnNoInternetConnection(object sender, EventArgs e)
+        {
+            IsInternetConnection = false;
         }
     }
 }

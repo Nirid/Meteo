@@ -118,5 +118,28 @@ namespace Meteo
             SelectedLocationChanged();
         }
 
+        private void RemoveLocationButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedLocation != XManager.LastLocation)
+            {
+                MessageBoxResult message = MessageBox.Show($"Jesteś pewny, że chcesz usunąć {SelectedLocation.ToString()}?", "Potwierdź", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (message == MessageBoxResult.Yes)
+                {
+                    var all = XManager.AllLocations.ToList();
+                    if (all.Contains(SelectedLocation) && SelectedLocation != XManager.LastLocation)
+                    {
+                        all.Remove(SelectedLocation);
+                        XManager.UpdateLocations(all);
+                        Locations = new ObservableCollection<Location>(all);
+                        CityList.ItemsSource = Locations;
+                        CityList.SelectedIndex = Locations.IndexOf(XManager.LastLocation);
+                    }
+                }
+            }else
+            {
+                MessageBox.Show("Nie można usnąć domyślnej lokalizacji, zmień domyślną lokalizację a następnie spróbuj usnąć lokalizację ponownie", "Błąd");
+            }
+        }
+
     }
 }

@@ -10,7 +10,7 @@ namespace Meteo
 {
     public static class Logging
     {
-        private static readonly string LogFolder = "Logs";
+        private static readonly string LogFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App\\Logs";
         private static readonly string LogPath = $"{LogFolder}\\Log {DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.log";
         private static int WriteNumber = 1;
 

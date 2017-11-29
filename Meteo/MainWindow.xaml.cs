@@ -24,19 +24,22 @@ namespace Meteo
     /// </summary>
     public partial class MainWindow : Window
     {
-        
+
         public MainWindow()
         {
             InitializeComponent();
 
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetTempPath() + "Weather");
-            FolderPath = System.IO.Path.GetTempPath() + "Weather";
+            System.IO.Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App");
+            FolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App";
 
             Handler = new FileHandler(FolderPath);
             XManager = new XMLManager(FolderPath);
             LegendHandler = new LegendHandler(FolderPath);
 
             Files = FileHandler.FileList;
+            FileHandler.WeatherFileDownloaded += OnWeatherFileDownloaded;
+            FileHandler.InternetConnection += OnInternetConnection;
+            FileHandler.NoInternetConnection += OnNoInternetConnection;
             NewestWeatherDate = XManager.ReadLastUpdateDate();
             FileHandler.CheckNewestWeather(XManager.LastLocation, NewestWeatherDate);
 
@@ -48,9 +51,7 @@ namespace Meteo
 
             if (Files.Where(x => x.Location == SelectedLocation && x.Date == NewestWeatherDate).Count() == 0)
                 Files.Add(new FileSet(SelectedLocation, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
-            SetWeatherSource(Files.Where(x=>x.Location == SelectedLocation && x.Status == FileSet.DownloadStatus.Downloaded).OrderByDescending(x=>x.Date).FirstOrDefault());
-
-            FileHandler.WeatherFileDownloaded += OnWeatherFileDownloaded;
+            SetWeatherSource(Files.Where(x => x.Location == SelectedLocation && x.Status == FileSet.DownloadStatus.Downloaded).OrderByDescending(x => x.Date).FirstOrDefault());
 
             LegendHandler.LegendDownloaded += OnLegendDownloaded;
             if (!LegendHandler.CheckForLegendInFolder(FolderPath))
@@ -60,13 +61,17 @@ namespace Meteo
 
             UpdateTimer = new System.Windows.Threading.DispatcherTimer();
             UpdateTimer.Tick += UpdateDispatcherTimer_Tick;
-            UpdateTimer.Interval = new TimeSpan(1, 0, 0);
+            UpdateTimer.Interval = new TimeSpan(0, 10, 0);
             UpdateTimer.Start();
 
             CleanupTimer = new System.Windows.Threading.DispatcherTimer();
             CleanupTimer.Tick += CleanupDispatcherTimer_Tick;
-            CleanupTimer.Interval = new TimeSpan(0, 17, 1);
+            CleanupTimer.Interval = new TimeSpan(0, 7, 1);
             CleanupTimer.Start();
+
+            NoInternetTimer = new System.Windows.Threading.DispatcherTimer();
+            NoInternetTimer.Tick += NoInternetTimer_Tick;
+            NoInternetTimer.Interval = new TimeSpan(0, 1, 0);
         }
 
         public readonly string FolderPath;
@@ -76,12 +81,14 @@ namespace Meteo
         private ObservableCollection<Location> Locations;
         private System.Windows.Threading.DispatcherTimer UpdateTimer;
         private System.Windows.Threading.DispatcherTimer CleanupTimer;
+        private System.Windows.Threading.DispatcherTimer NoInternetTimer;
         private DateTime NewestWeatherDate;
         private Location SelectedLocation;
         private FileSet Displayed;
         private ObservableCollection<FileSet> Files;
         private object SyncObject = new object();
         private object SyncObject2 = new object();
+        private bool IsInternetConnection = true;
 
         private void UpdateDispatcherTimer_Tick(object sender, EventArgs e)
         {
@@ -90,7 +97,32 @@ namespace Meteo
 
         private void CleanupDispatcherTimer_Tick(object sender, EventArgs e)
         {
-            FileHandler.RemoveOutdatedFiles(FolderPath);
+            if (!Files.Any(x => x.Status == FileSet.DownloadStatus.ToBeDownloaded || x.Status == FileSet.DownloadStatus.ToBeDeleted))
+                FileHandler.RemoveOutdatedFiles(FolderPath);
+        }
+
+        private void NoInternetTimer_Tick(object sender, EventArgs e)
+        {
+            var selected = Files.Where(x => x.Location == SelectedLocation).OrderByDescending(x => x.Date).ToList();
+            if (selected.Count > 0)
+            {
+                foreach (var set in selected)
+                {
+                    if (set.Status != FileSet.DownloadStatus.IsDisplayed)
+                    {
+                        var newSet = new FileSet(set.Location, set.Date, FileSet.DownloadStatus.ToBeDownloaded);
+                        Files.Remove(set);
+                        Files.Add(newSet);
+                        return;
+                    }
+                }
+                Files.Add(new FileSet(SelectedLocation, NewestWeatherDate.AddHours(-6), FileSet.DownloadStatus.ToBeDownloaded));
+                return;
+            }else
+            {
+                Files.Add(new FileSet(SelectedLocation, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
+                return;
+            }
         }
 
         private void SetWeatherSource(FileSet set)
@@ -121,6 +153,8 @@ namespace Meteo
 
         private void ForceUpdate()
         {
+            if (!IsInternetConnection)
+                NoInternetTimer_Tick(this, null);
             UpdateDispatcherTimer_Tick(this, null);
             UpdateTimer.Stop();
             UpdateTimer.Start();
@@ -128,21 +162,22 @@ namespace Meteo
 
         private void SelectedLocationChanged()
         {
+            UpdateTextbox();
             var other = Files.Where(x => x.Location == SelectedLocation && (x.Status == FileSet.DownloadStatus.Downloaded || x.Status == FileSet.DownloadStatus.IsDisplayed)).OrderByDescending(x => x.Date).ToList();
             if (other.Count == 0)
             {
                 Files.Add(new FileSet(SelectedLocation, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
                 return;
-            } else
+            }
+            else
             {
                 var first = other.First();
-                if(first.Date < NewestWeatherDate)
+                if (first.Date < NewestWeatherDate)
                 {
                     Files.Add(new FileSet(SelectedLocation, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
                 }
                 SetWeatherSource(first);
             }
-            UpdateTextbox();
         }
 
         private void NewestWeatherDateChanged()
@@ -182,6 +217,14 @@ namespace Meteo
                         SetWeatherSource(set);
                     }
                 }
+                else if (set.Status == FileSet.DownloadStatus.DownloadFailed)
+                {
+                    
+                }
+                else if (set.Status == FileSet.DownloadStatus.NoWeatherFile)
+                {
+                    
+                }
             }
         }
 
@@ -189,5 +232,20 @@ namespace Meteo
         {
             SetLegendSource();
         }
+
+        private void OnNoInternetConnection(object sender, EventArgs e)
+        {
+            IsInternetConnection = false;
+            RefreshButton.Dispatcher.BeginInvoke(new Action(() => { RefreshButton.Background = Brushes.Red; }));
+            NoInternetTimer.Start();
+        }
+
+        private void OnInternetConnection(object sender, EventArgs e)
+        {
+            IsInternetConnection = true;
+            RefreshButton.Dispatcher.BeginInvoke(new Action(() => { RefreshButton.Background = Brushes.LimeGreen; }));
+            NoInternetTimer.Stop();
+        }
+
     }
 }
