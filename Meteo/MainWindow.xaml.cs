@@ -72,6 +72,10 @@ namespace Meteo
             NoInternetTimer = new System.Windows.Threading.DispatcherTimer();
             NoInternetTimer.Tick += NoInternetTimer_Tick;
             NoInternetTimer.Interval = new TimeSpan(0, 1, 0);
+
+            var poznan = Downloader.GetLocation("poznan");
+            var warszawa = Downloader.GetLocation("warszawa");
+
         }
 
         public readonly string FolderPath;

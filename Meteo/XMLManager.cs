@@ -53,14 +53,28 @@ namespace Meteo
             Doc.Save(Path);
         }
 
-        [System.Obsolete("AddLocation is deprecated, please use UpdateLocations instead.")]
         public bool AddLocation(Location location)
         {
-            if (Doc.Descendants("Location").Any(x => XElementToLocation(x) == location))
+            var all = AllLocations.ToList();
+            if (all.Any(x => x == location))
                 return false;
-            Doc.Descendants("Locations").Single().Add(LocationToXlement(location));
-            Doc.Save(Path);
+            all.Add(location);
+            UpdateLocations(all);
             return true;
+        }
+
+        public bool ReplaceLocation(Location old, Location replacement)
+        {
+            if (AllLocations.Contains(old))
+            {
+                var all = AllLocations.ToList();
+                var index = all.IndexOf(old);
+                all.Remove(old);
+                all.Insert(index, replacement);
+                UpdateLocations(all);
+                return true;
+            }
+            return false;
         }
 
         public void UpdateLocations(IEnumerable<Location> locations)

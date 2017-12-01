@@ -5,15 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:tb="http://www.hardcodet.net/taskbar" 
         xmlns:local="clr-namespace:Meteo"
+        xmlns:taskbar="clr-namespace:Meteo.TaskbarIcon"
         mc:Ignorable="d"
-        Title="Pogoda" Height="700" Width="1100" ResizeMode="NoResize" ShowInTaskbar="False">
+        Title="Meteo App" Height="700" Width="1100" ResizeMode="NoResize" ShowInTaskbar="False">
 
     <Grid HorizontalAlignment="Left" Width="1090" Height="670" VerticalAlignment="Top" Margin="0,0,0,0">
 
         <Grid.Resources>
-            <local:ControlWindowCommand
-
-        x:Key="ControlWindow" />
+            <taskbar:Show x:Key="Show" />
+            <taskbar:Hide x:Key="Hide" />
+            <taskbar:Close x:Key="Close" />
         </Grid.Resources>
 
         <Image Margin="450,0,0,10" x:Name="WeatherImage" Height="660" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="630"/>
@@ -33,11 +34,28 @@
         <TextBox x:Name="NewLocalizationNameTextbox" HorizontalAlignment="Left" Height="23" Margin="10,432,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
         <Label Content="Nazwa nowego miejsca:" HorizontalAlignment="Left" Margin="10,401,0,0" VerticalAlignment="Top"/>
         <Button x:Name="SaveNewLocalizationButton" Content="Zapisz pod nazwą" HorizontalAlignment="Left" Margin="10,470,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" Click="SaveNewLocalizationButton_Click" />
-        
+
 
         <tb:TaskbarIcon x:Name="Notifycation" IconSource="Resources/icon.ico" ToolTipText="Meteo App" 
-                        LeftClickCommand="{StaticResource ControlWindow}" LeftClickCommandParameter="{x:Reference Name=window}"  />
-       
+                        LeftClickCommand="{StaticResource Show}" LeftClickCommandParameter="{x:Reference Name=window}">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Pokaż okno"
+                              Command="{StaticResource Show}"
+                              CommandParameter="{x:Reference Name=window}">
+                    </MenuItem>
+                    <MenuItem Header="Showaj okno"
+                              Command="{StaticResource Hide}"
+                              CommandParameter="{x:Reference Name=window}">
+                    </MenuItem>
+                    <MenuItem Header="Zamknij program"
+                              Command="{StaticResource Close}"
+                              CommandParameter="{x:Reference Name=window}">
+                    </MenuItem>
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+
 
 
 

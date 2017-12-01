@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -87,8 +88,10 @@ namespace Meteo
                 return;
             int index = Locations.IndexOf(loc);
             var replaced = Locations[index];
-            Locations[index] = new Location(replaced.Name, replaced.X, replaced.Y, true);
+            var newLocation = new Location(replaced.Name, replaced.X, replaced.Y, true);
+            Locations[index] = newLocation;
             CityList.SelectedIndex = Locations.IndexOf(loc);
+            XManager.ReplaceLocation(replaced, newLocation);
         }
 
         private void AutoUpdateCheckbox_Unchecked(object sender, RoutedEventArgs e)
@@ -98,8 +101,10 @@ namespace Meteo
                 return;
             int index = Locations.IndexOf(loc);
             var replaced = Locations[index];
-            Locations[index] = new Location(replaced.Name, replaced.X, replaced.Y, false);
+            var newLocation = new Location(replaced.Name, replaced.X, replaced.Y, false);
+            Locations[index] = newLocation;
             CityList.SelectedIndex = Locations.IndexOf(loc);
+            XManager.ReplaceLocation(replaced, newLocation);
         }
 
         private void CityList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -135,9 +140,26 @@ namespace Meteo
                         CityList.SelectedIndex = Locations.IndexOf(XManager.LastLocation);
                     }
                 }
-            }else
+            }
+            else
             {
                 MessageBox.Show("Nie można usnąć domyślnej lokalizacji, zmień domyślną lokalizację a następnie spróbuj usnąć lokalizację ponownie", "Błąd");
+            }
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            //TODO: Change this check
+            if (this.FontWeight == FontWeights.UltraBold)
+            {
+                Notifycation.Dispose();
+                return;
+            }
+            else
+            {
+                (this as Window).Visibility = Visibility.Hidden;
+                e.Cancel = true;
+                return;
             }
         }
 
