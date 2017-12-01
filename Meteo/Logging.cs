@@ -13,18 +13,22 @@ namespace Meteo
         private static readonly string LogFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App\\Logs";
         private static readonly string LogPath = $"{LogFolder}\\Log {DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.log";
         private static int WriteNumber = 1;
+        private static object SyncObject = new object();
 
         [Conditional("DEBUG")]
         public static void Log(string message)
         {
-            if (!Directory.Exists(LogFolder))
-                Directory.CreateDirectory(LogFolder);
-            using (StreamWriter streamWriter = new StreamWriter(LogPath,append:true))
+            lock (SyncObject)
             {
-                streamWriter.WriteLine($"{WriteNumber.ToString("D6")} {DateTime.Now} | {message}");
-                streamWriter.Close();
+                if (!Directory.Exists(LogFolder))
+                    Directory.CreateDirectory(LogFolder);
+                using (StreamWriter streamWriter = new StreamWriter(LogPath, append: true))
+                {
+                    streamWriter.WriteLine($"{WriteNumber.ToString("D6")} {DateTime.Now} | {message}");
+                    streamWriter.Close();
+                }
+                WriteNumber++;
             }
-            WriteNumber++;
         }
 
 

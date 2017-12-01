@@ -96,6 +96,7 @@ namespace Meteo
 
         private void UpdateDispatcherTimer_Tick(object sender, EventArgs e)
         {
+            CheckForNewestWeatherFiles();
             FileHandler.CheckNewestWeather(SelectedLocation, NewestWeatherDate);
         }
 
@@ -184,7 +185,7 @@ namespace Meteo
             }
         }
 
-        private void NewestWeatherDateChanged()
+        private void CheckForNewestWeatherFiles()
         {
             var Updateable = from file in Files
                              where (file.Location.Update == true) || (file.Location == SelectedLocation)
@@ -214,7 +215,7 @@ namespace Meteo
                     {
                         NewestWeatherDate = set.Date;
                         XManager.UpdateLastWeatherUpdateDate(set.Date);
-                        NewestWeatherDateChanged();
+                        CheckForNewestWeatherFiles();
                     }
                     if (set.Location == SelectedLocation && (Displayed != null && ((Displayed.Location != SelectedLocation) || (Displayed.Location == SelectedLocation && set.Date > Displayed.Date)) || Displayed == null))
                     {
