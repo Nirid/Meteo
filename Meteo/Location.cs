@@ -7,7 +7,7 @@ using System.Device.Location;
 
 namespace Meteo
 {
-    class Location
+    public class Location
     {
         public string Name = "";
         public int Y;
@@ -66,7 +66,18 @@ namespace Meteo
                 X = 430;
 
             return (X, Y);
+        }
 
+        public static Location SnapToGrid(string Name,int X, int Y)
+        {
+            var XY = SnapToGrid(X, Y);
+            return new Location(Name, XY.X, XY.Y);
+        }
+
+        public static Location SnapToGrid(string Name, int X, int Y, bool Update)
+        {
+            var XY = SnapToGrid(X, Y);
+            return new Location(Name, XY.X, XY.Y,Update);
         }
 
         public static Location GPSToLocation(GeoCoordinate position)
@@ -91,8 +102,8 @@ namespace Meteo
 
         public static GeoCoordinate LocationToGPS(Location location)
         {
-            double x = location.X;
-            double y = location.Y;
+            double x = (location.X - 17)/7;
+            double y = (location.Y-17)/7;
             //Equations from multiple polynomial regression of location data to GPS data http://www.xuru.org/rt/MPR.asp
             double lon = -1.899951859 * 0.0000001 * x * x * x + 4.855492035 * 0.000001 * x * x * y - 3.781221562 * 0.00000001 * x * y * y + 6.765459654 * 0.00000001 * y * y * y
                 - 9.792127456 * 0.0001 * x * x - 2.799965842 * 0.0001 * x * y - 2.083901458 * 0.00001 * y * y + 5.771826024 * 0.01 * x - 2.465070465 * 0.1 * y + 65.31579252;

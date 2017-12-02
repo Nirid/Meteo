@@ -37,6 +37,7 @@ namespace Meteo
             LegendHandler = new LegendHandler(FolderPath);
 
             Files = FileHandler.FileList;
+            //TODO: sprawdizić które się pokrywają z lokacjami z XManager AllLocations i ustawić name i Update odpowiednio
             FileHandler.WeatherFileDownloaded += OnWeatherFileDownloaded;
             FileHandler.InternetConnection += OnInternetConnection;
             FileHandler.NoInternetConnection += OnNoInternetConnection;
@@ -185,6 +186,55 @@ namespace Meteo
             }
         }
 
+        private bool AddLocation(Location location)
+        {
+            var all = XManager.AllLocations;
+            if (!all.Contains(location) && !all.Any(x=>x.Name.Trim(' ').ToLower() == location.Name.Trim(' ').ToLower()))
+            {
+                XManager.AddLocation(location);
+                var choosenLocation = (Location)CityList.SelectedItem;
+                Locations = new ObservableCollection<Location>(XManager.AllLocations.ToList());
+                CityList.ItemsSource = Locations;
+                CityList.SelectedItem = choosenLocation;
+                return true;
+            }else
+            {
+                return false;
+            }
+        }
+
+        private bool RemoveLocation(Location location)
+        {
+            var all = XManager.AllLocations.ToList();
+            if (all.Contains(location) && location != XManager.LastLocation)
+            {
+                all.Remove(location);
+                XManager.UpdateLocations(all);
+                Locations = new ObservableCollection<Location>(all);
+                CityList.ItemsSource = Locations;
+                CityList.SelectedIndex = Locations.IndexOf(XManager.LastLocation);
+                return true;
+            }
+            return false;
+        }
+
+        private bool ReplaceLocation(Location oldLocation,Location newLocation)
+        {
+            var all = XManager.AllLocations.ToList();
+            if (all.Contains(oldLocation) && oldLocation != XManager.LastLocation && !all.Contains(newLocation) && !all.Any(x => x.Name.Trim(' ').ToLower() == newLocation.Name.Trim(' ').ToLower()))
+            {
+                var index = all.IndexOf(oldLocation);
+                all.Remove(oldLocation);
+                all.Insert(index, newLocation);
+                XManager.UpdateLocations(all);
+                Locations = new ObservableCollection<Location>(all);
+                CityList.ItemsSource = Locations;
+                CityList.SelectedIndex = index;
+                return true;
+            }
+            return false;
+        }
+
         private void CheckForNewestWeatherFiles()
         {
             var Updateable = from file in Files
@@ -252,5 +302,6 @@ namespace Meteo
             NoInternetTimer.Stop();
         }
 
+        
     }
 }

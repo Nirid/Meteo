@@ -71,12 +71,9 @@ namespace Meteo
             {
                 var loc = Location.SnapToGrid(X, Y);
                 var location = new Location(name, loc.X, loc.Y);
-                if (!XManager.AllLocations.Contains(location))
+                if(!AddLocation(location))
                 {
-                    XManager.AddLocation(location);
-                    Locations = new ObservableCollection<Location>(XManager.AllLocations.ToList());
-                    CityList.ItemsSource = Locations;
-                    CityList.SelectedItem = location;
+                    MessageBox.Show("Lokalizacja o identycznej nazwie lub położeniu już istnieje", "Błąd");
                 }
             }
         }
@@ -130,20 +127,26 @@ namespace Meteo
                 MessageBoxResult message = MessageBox.Show($"Jesteś pewny, że chcesz usunąć {SelectedLocation.ToString()}?", "Potwierdź", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (message == MessageBoxResult.Yes)
                 {
-                    var all = XManager.AllLocations.ToList();
-                    if (all.Contains(SelectedLocation) && SelectedLocation != XManager.LastLocation)
-                    {
-                        all.Remove(SelectedLocation);
-                        XManager.UpdateLocations(all);
-                        Locations = new ObservableCollection<Location>(all);
-                        CityList.ItemsSource = Locations;
-                        CityList.SelectedIndex = Locations.IndexOf(XManager.LastLocation);
-                    }
+                    RemoveLocation(SelectedLocation);
                 }
             }
             else
             {
                 MessageBox.Show("Nie można usnąć domyślnej lokalizacji, zmień domyślną lokalizację a następnie spróbuj usnąć lokalizację ponownie", "Błąd");
+            }
+        }
+
+        private void LocatonEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            var editWindow = new EditWindow(SelectedLocation, true);
+            var result = editWindow.ShowDialog();
+            var location = editWindow.InitialLocation;
+            if (result == true)
+            {
+                if(!ReplaceLocation(SelectedLocation, location))
+                {
+                    //TODO: Error massage
+                }
             }
         }
 

@@ -61,6 +61,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CustomObservableColletion.cs" />
+    <Compile Include="EditWindow.xaml.cs">
+      <DependentUpon>EditWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FileHandler.cs" />
     <Compile Include="FileSet.cs" />
     <Compile Include="FolderHandler.cs" />
@@ -69,6 +72,10 @@
     <Compile Include="TaskbarIcon\Close.cs" />
     <Compile Include="TaskbarIcon\Hide.cs" />
     <Compile Include="XMLManager.cs" />
+    <Page Include="EditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

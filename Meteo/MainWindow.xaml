@@ -23,7 +23,8 @@
         <ComboBox x:Name="CityList" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CityList_SelectionChanged" />
         <CheckBox x:Name="AutoUpdateCheckbox" Content="Aktualizuj automatycznie" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="155" Checked="AutoUpdateCheckbox_Checked" Unchecked="AutoUpdateCheckbox_Unchecked"/>
         <Button x:Name="SetDefaultButton" Content="Ustaw jako domyślne" HorizontalAlignment="Left" Margin="10,114,0,0" VerticalAlignment="Top" Width="155" RenderTransformOrigin="0.427,0.9" Click="SetDefaultButton_Click"/>
-        <Button x:Name="RemoveLocationButton" Content="Usuń lokalizację" HorizontalAlignment="Left" Margin="11,139,0,0" VerticalAlignment="Top" Width="154" Click="RemoveLocationButton_Click"/>
+        <Button x:Name="LocatonEditButton" Content="Edytuj lokalizację" HorizontalAlignment="Left" Margin="10,139,0,0" VerticalAlignment="Top" Width="155" Click="LocatonEditButton_Click"/>
+        <Button x:Name="RemoveLocationButton" Content="Usuń lokalizację" HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" Width="155" Click="RemoveLocationButton_Click"/>
         <Label Content="Miejsce:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="ManualMode" Content="Tryb manualny" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,215,0,0" Checked="ManualMode_Checked" Unchecked="ManualMode_Unchecked"/>
         <TextBox x:Name="XTextbox" HorizontalAlignment="Left" Height="23" Margin="11,265,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
@@ -55,6 +56,7 @@
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
+        
 
 
 
