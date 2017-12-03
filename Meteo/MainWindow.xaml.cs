@@ -33,7 +33,7 @@ namespace Meteo
             FolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App";
 
             XManager = new XMLManager(FolderPath);
-            Handler = new FileHandler(FolderPath,XManager);
+            Handler = new FileHandler(FolderPath);
             LegendHandler = new LegendHandler(FolderPath);
 
             Files = FileHandler.FileList;
