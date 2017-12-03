@@ -32,8 +32,8 @@ namespace Meteo
             System.IO.Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App");
             FolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App";
 
-            Handler = new FileHandler(FolderPath);
             XManager = new XMLManager(FolderPath);
+            Handler = new FileHandler(FolderPath,XManager);
             LegendHandler = new LegendHandler(FolderPath);
 
             Files = FileHandler.FileList;
@@ -237,6 +237,9 @@ namespace Meteo
 
         private void CheckForNewestWeatherFiles()
         {
+            //For every location in AllLocations find Filesets in Files that have the same location then set Update property to be the same as AllLoctions Update property
+            XManager.AllLocations.Select(location => (location, Files.Where(y => y.Location == location))).ToList().ForEach(x => x.Item2.ToList().ForEach(y => y.Location.Update = x.location.Update));
+
             var Updateable = from file in Files
                              where (file.Location.Update == true) || (file.Location == SelectedLocation)
                              group file by file.Location into set

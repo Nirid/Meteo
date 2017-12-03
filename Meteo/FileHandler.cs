@@ -8,18 +8,20 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace Meteo
 {
     partial class FileHandler
     {
-        public FileHandler(string path)
+        public FileHandler(string path,XMLManager document)
         {
             Path = path;
             FileList.CollectionChanged += OnFileListCollectionchanged;
             FileList.ItemPropertyChanged += OnItemPropertyChanged;
             InternetConnection += OnInternetConnection;
             NoInternetConnection += OnNoInternetConnection;
+            XManager = document;
             foreach(var set in CheckFolder(Path))
             {
                 FileList.Add(set);
@@ -34,6 +36,7 @@ namespace Meteo
         public static event EventHandler NoInternetConnection;
         public static event EventHandler InternetConnection;
         public static bool IsInternetConnection = true;
+        private static XMLManager XManager;
 
         public static string GetName(Location location, DateTime date) => $"Date{date.ToString("yyyy-MM-dd-HH", IC)} X{location.X.ToString(IC)} Y{location.Y.ToString(IC)} .png";
         public static string GetName(FileSet set) => GetName(set.Location, set.Date);
@@ -87,7 +90,9 @@ namespace Meteo
                                 return;
                             }
                             else if (set.Status == FileSet.DownloadStatus.Downloaded)
+                            {
                                 return;
+                            }
                             else
                                 throw new ArgumentException();
                         }
