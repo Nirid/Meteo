@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="Meteo App" Height="700" Width="1100" ResizeMode="NoResize" ShowInTaskbar="False">
 
-    <Grid HorizontalAlignment="Left" Width="1090" Height="670" VerticalAlignment="Top" Margin="0,0,0,0">
+    <Grid x:Name="MainGrid" HorizontalAlignment="Left" Width="1090" Height="670" VerticalAlignment="Top" Margin="0,0,0,0">
 
         <Grid.Resources>
             <taskbar:Show x:Key="Show" />
@@ -19,6 +19,7 @@
 
         <Image Margin="450,0,0,10" x:Name="WeatherImage" Height="660" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="630"/>
         <Image x:Name="LegendaImage" Height="660" VerticalAlignment="Top" RenderTransformOrigin="1.705,0.498" HorizontalAlignment="Right" Width="280" Margin="0,0,640,0"/>
+        <Line x:Name="TimeLine" X1="520" Y1="57" X2="520" Y2="604" Stroke="Red" StrokeThickness="1" Visibility="Hidden" />
         <Button x:Name="RefreshButton" Content="Odśwież" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="155" Background="LimeGreen" Click="RefreshButton_Click"/>
         <ComboBox x:Name="CityList" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CityList_SelectionChanged" />
         <CheckBox x:Name="AutoUpdateCheckbox" Content="Aktualizuj automatycznie" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="155" Checked="AutoUpdateCheckbox_Checked" Unchecked="AutoUpdateCheckbox_Unchecked"/>
@@ -35,7 +36,6 @@
         <TextBox x:Name="NewLocalizationNameTextbox" HorizontalAlignment="Left" Height="23" Margin="10,432,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
         <Label Content="Nazwa nowego miejsca:" HorizontalAlignment="Left" Margin="10,401,0,0" VerticalAlignment="Top"/>
         <Button x:Name="SaveNewLocalizationButton" Content="Zapisz pod nazwą" HorizontalAlignment="Left" Margin="10,470,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False" Click="SaveNewLocalizationButton_Click" />
-
 
         <tb:TaskbarIcon x:Name="Notifycation" IconSource="Resources/icon.ico" ToolTipText="Meteo App" 
                         LeftClickCommand="{StaticResource Show}" LeftClickCommandParameter="{x:Reference Name=window}">

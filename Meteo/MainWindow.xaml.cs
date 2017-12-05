@@ -97,8 +97,12 @@ namespace Meteo
 
         private void UpdateDispatcherTimer_Tick(object sender, EventArgs e)
         {
-            CheckForNewestWeatherFiles();
-            FileHandler.CheckNewestWeather(SelectedLocation, NewestWeatherDate);
+            lock (SyncObject2)
+            {
+                CheckForNewestWeatherFiles();
+                FileHandler.CheckNewestWeather(SelectedLocation, NewestWeatherDate);
+                SetTimeline(Files.Where(x => x.Status == FileSet.DownloadStatus.IsDisplayed).Single().Date);
+            }
         }
 
         private void CleanupDispatcherTimer_Tick(object sender, EventArgs e)
@@ -146,6 +150,7 @@ namespace Meteo
                     var Bitmap = new BitmapImage(uriWeatherLocal);
                     Bitmap.Freeze();
                     WeatherImage.Dispatcher.BeginInvoke(new Action(() => WeatherImage.Source = Bitmap));
+                    SetTimeline(set.Date);
                 }
             }
         }
@@ -155,6 +160,24 @@ namespace Meteo
             var uriLegend = new Uri(LegendHandler.LegendPath);
             var uriLegendLocal = new Uri(uriLegend.LocalPath);
             LegendaImage.Source = new BitmapImage(uriLegendLocal);
+        }
+
+        private void SetTimeline(DateTime date)
+        {
+            TimeLine.Dispatcher.BeginInvoke(new Action(() => { TimeLine.Visibility = Visibility.Visible; }));
+            double LeftDistance = WeatherImage.Dispatcher.Invoke(new Func<double>(() => { return WeatherImage.Margin.Left; }));
+            if (date.TimeOfDay == new TimeSpan(0, 0, 0) || date.TimeOfDay == new TimeSpan(12, 0, 0))
+            {
+                LeftDistance += 69.0 + 6.40278 * (DateTime.Now - date).TotalHours;
+                TimeLine.Dispatcher.BeginInvoke(new Action(() => { TimeLine.X1 = TimeLine.X2 = LeftDistance; }));
+            }
+            else if (date.TimeOfDay == new TimeSpan(6, 0, 0) || date.TimeOfDay == new TimeSpan(18, 0, 0))
+            {
+                LeftDistance += 63 + 7.04167 * (DateTime.Now - date).TotalHours; ;
+                TimeLine.Dispatcher.BeginInvoke(new Action(() => { TimeLine.X1 = TimeLine.X2 = LeftDistance; }));
+            }
+            else
+                throw new ArgumentOutOfRangeException();
         }
 
         private void ForceUpdate()
@@ -240,15 +263,25 @@ namespace Meteo
             //For every location in AllLocations find Filesets in Files that have the same location then set Update property to be the same as AllLoctions Update property
             XManager.AllLocations.Select(location => (location, Files.Where(y => y.Location == location))).ToList().ForEach(x => x.Item2.ToList().ForEach(y => y.Location.Update = x.location.Update));
 
-            var Updateable = from file in Files
+            //Take newest file for every location, if it isn't newest file download it
+            var updateableFiles = from file in Files
                              where (file.Location.Update == true) || (file.Location == SelectedLocation)
                              group file by file.Location into set
                              let first = set.OrderByDescending(x => x.Date).First()
                              where first.Date < NewestWeatherDate
                              select set.Where(x => x == first).Single();
 
-            foreach (var set in Updateable)
+            foreach (var set in updateableFiles)
                 Files.Add(new FileSet(set.Location, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
+
+            //If Locations with Update = true aren't in Files add them
+            var fromXml = from location in XManager.AllLocations
+                          where location.Update == true
+                          where !Files.Any(x => x.Location == location)
+                          select location;
+
+            foreach (var location in fromXml)
+                Files.Add(new FileSet(location, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
         }
 
         private void OnUpdateLocations(object Sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
