@@ -31,6 +31,7 @@ namespace Meteo
             var allData = (from file in Directory.GetFiles(Path)
                            let data = GetLocationAndDate(file)
                            where data != null && data.Value.location != null
+                           where (new FileInfo(file)).Length > 100000
                            select new FileSet(data.Value.location, data.Value.date, FileSet.DownloadStatus.Downloaded)).ToList();
 
             var duplicates = from data in allData
