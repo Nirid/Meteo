@@ -20,9 +20,11 @@ namespace Meteo
     /// </summary>
     public partial class EditWindow : Window
     {
-        public EditWindow(Location location, bool isEdit)
+        public EditWindow(Location location,IEnumerable<Location> allLocations, bool isEdit)
         {
             InitializeComponent();
+            AllLocations = allLocations.ToList();
+            AllLocations.Remove(location);
             if(isEdit)
             {
                 Title = "Edycja Lokalizacji";
@@ -37,10 +39,22 @@ namespace Meteo
 
         public Location InitialLocation;
         private Location CurrentLocation;
+        private IList<Location> AllLocations;
         private GeoCoordinate CurrentCoordinate { get { return Location.LocationToGPS(CurrentLocation); } }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
+            Keyboard.ClearFocus();
+            if (CurrentLocation.Name.Length < 1 || AllLocations.Any(x=>x.Name == CurrentLocation.Name))
+            {
+                MessageBox.Show("Nazwa musi być unikalna", "Błąd");
+                return;
+            }
+            if(AllLocations.Contains(CurrentLocation))
+            {
+                MessageBox.Show("Lokalizacja o tych koordynatach już istnieje", "Błąd");
+                return;
+            }
             InitialLocation = new Location(CurrentLocation.Name, CurrentLocation.X, CurrentLocation.Y, InitialLocation.Update);
             DialogResult = true;
             this.Close();
@@ -48,6 +62,7 @@ namespace Meteo
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            Keyboard.ClearFocus();
             DialogResult = false;
             this.Close();
         }
@@ -65,17 +80,14 @@ namespace Meteo
         {
             if (!int.TryParse(LocationXTextBox.Text, out int X))
             {
-                //TODO:Error Massage
+                MessageBox.Show("X musi być liczbą całkowitą", "Błąd");
+                UpdateTextBoxes(CurrentLocation);
                 return null;
             }
             if(!int.TryParse(LocationYTextBox.Text,out int Y))
             {
-                //TODO:Error Massage
-                return null;
-            }
-            if (NameTextBox.Text.Length < 1)
-            {
-                //TODO:Error Massage
+                MessageBox.Show("Y musi być liczbą całkowitą", "Błąd");
+                UpdateTextBoxes(CurrentLocation);
                 return null;
             }
             return Location.SnapToGrid(NameTextBox.Text, X, Y);
@@ -85,16 +97,26 @@ namespace Meteo
         {
             if (!double.TryParse(LocationETextBox.Text, out double E))
             {
-                //TODO:Error Massage
+                MessageBox.Show("E musi być liczbą", "Błąd");
+                UpdateTextBoxes(CurrentLocation);
                 return null;
             }
             if (!double.TryParse(LocationNTextBox.Text, out double N))
             {
-                //TODO:Error Massage
+                MessageBox.Show("N musi być liczbą", "Błąd");
+                UpdateTextBoxes(CurrentLocation);
                 return null;
             }
+            if (N < 0)
+                N = 0;
+            else if (N > 90)
+                N = 90;
+            if (E < 0)
+                E = 0;
+            else if (E > 90)
+                E = 90;
 
-            return Location.GPSToLocation(new GeoCoordinate(N,E)); 
+            return Location.GPSToLocation(NameTextBox.Text, new GeoCoordinate(N,E)); 
         }
 
         private void LocationChanged()
@@ -139,9 +161,10 @@ namespace Meteo
 
         private void NameTextBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (NameTextBox.Text.Length < 1)
+            if (NameTextBox.Text.Length < 1 || AllLocations.Any(x => x.Name == CurrentLocation.Name))
             {
-                //TODO:Error Massage
+                MessageBox.Show("Nazwa musi być unikalna", "Błąd");
+                UpdateTextBoxes(CurrentLocation);
             }
             else
             {

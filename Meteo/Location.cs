@@ -9,9 +9,21 @@ namespace Meteo
 {
     public class Location
     {
+        /// <summary>
+        /// Location's name
+        /// </summary>
         public string Name = "";
+        /// <summary>
+        /// Y coordinate, used by meteo.pl
+        /// </summary>
         public int Y;
+        /// <summary>
+        /// X coordinate, used by meteo.pl
+        /// </summary>
         public int X;
+        /// <summary>
+        /// When true Location will be updated whenever possible.
+        /// </summary>
         public bool Update = false;
 
         public Location(string Name, int X, int Y, bool Update) : this(Name, X, Y)
@@ -42,7 +54,10 @@ namespace Meteo
             else
                 throw new ArgumentOutOfRangeException("X must have allowed value");
         }
-
+        /// <summary>
+        /// Snaps provided coordinates to allowed value.
+        /// </summary>
+        /// <returns>Coordinates with correct values</returns>
         public static (int X, int Y) SnapToGrid(int X, int Y)
         {
             if (AllowedX.Contains(X) && AllowedY.Contains(Y))
@@ -67,19 +82,27 @@ namespace Meteo
 
             return (X, Y);
         }
-
+        /// <summary>
+        /// Snaps provided coordinates to allowed value and creates Location.
+        /// </summary>
+        /// <returns>Location with correct coordinates</returns>
         public static Location SnapToGrid(string Name,int X, int Y)
         {
             var XY = SnapToGrid(X, Y);
             return new Location(Name, XY.X, XY.Y);
         }
-
+        /// <summary>
+        /// Snaps provided coordinates to allowed value and creates location.
+        /// </summary>
+        /// <returns>Location with correct coordinates</returns>
         public static Location SnapToGrid(string Name, int X, int Y, bool Update)
         {
             var XY = SnapToGrid(X, Y);
             return new Location(Name, XY.X, XY.Y,Update);
         }
-
+        /// <summary>
+        /// Transforms provided GeoCoordinate to Location with corresponding values.
+        /// </summary>
         public static Location GPSToLocation(GeoCoordinate position)
         {
             double lat = position.Latitude; //E-W
@@ -99,7 +122,19 @@ namespace Meteo
                 Y = 83;
             return new Location(17 + ((int)Math.Round(X)) * 7, 17 + ((int)Math.Round(Y)) * 7);
         }
-
+        /// <summary>
+        /// Transforms provided GeoCoordinate to Location with corresponding values.
+        /// </summary>
+        /// <param name="name">Name for Location created</param>
+        public static Location GPSToLocation(string name, GeoCoordinate position)
+        {
+            Location location = GPSToLocation(position);
+            location.Name = name;
+            return location;
+        }
+        /// <summary>
+        /// Transforms Location object to corresponding GeoCoordinate.
+        /// </summary>
         public static GeoCoordinate LocationToGPS(Location location)
         {
             double x = (location.X - 17)/7;
@@ -158,7 +193,9 @@ namespace Meteo
         {
             return Name;
         }
-
+        /// <summary>
+        /// Premade Locations cooreesponding to largest cities
+        /// </summary>
         public static class Cities
         {
             public static Location Bialystok { get { return new Location("Białystok", 285, 379); } }

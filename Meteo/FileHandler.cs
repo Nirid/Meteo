@@ -14,6 +14,7 @@ namespace Meteo
 {
     partial class FileHandler
     {
+       /// <param name="path">Path to folder with program data.</param>
         public FileHandler(string path)
         {
             Path = path;
@@ -39,8 +40,15 @@ namespace Meteo
         public static string GetName(Location location, DateTime date) => $"Date{date.ToString("yyyy-MM-dd-HH", IC)} X{location.X.ToString(IC)} Y{location.Y.ToString(IC)} .png";
         public static string GetName(FileSet set) => GetName(set.Location, set.Date);
         public static string GetFilename(Location location, DateTime date) => Path + "\\" + GetName(location, date);
+        /// <summary>
+        /// Returns filename corresponding to provided FileSet
+        /// </summary>
+        /// <param name="set"></param>
+        /// <returns></returns>
         public static string GetFilename(FileSet set) => GetFilename(set.Location, set.Date);
-
+        /// <summary>
+        /// Returns Location and DateTime form filename.
+        /// </summary>
         public static (Location location, DateTime date)? GetLocationAndDate(string str)
         {
             Regex regex = new Regex(@"Date(\d{4})-(\d{1,2})-(\d{1,2})-(\d{1,2}) X(\d{2,3}) Y(\d{2,3}) .png");

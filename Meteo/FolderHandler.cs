@@ -9,6 +9,10 @@ namespace Meteo
 {
     partial class FileHandler
     {
+        /// <summary>
+        /// Checks folder for existing files and returns FileSets cooresponding to those files.
+        /// </summary>
+        /// <param name="path">Path to folder</param>
         public static IEnumerable<FileSet> CheckFolder(string path)
         {
             RemoveOutdatedFiles(path);
@@ -20,6 +24,8 @@ namespace Meteo
             return set;
         }
 
+        /// <returns>FileSets cooresponding to damaged and outdated files</returns>
+        /// <param name="path">Path to folder</param>
         private static IEnumerable<FileSet> GetOutdatedAndDamagedFiles(string path)
         {
             var allData = (from file in Directory.GetFiles(Path)
@@ -45,7 +51,10 @@ namespace Meteo
 
             return duplicates.Concat(outdated.Concat(tooSmall)).ToList();
         }
-
+        /// <summary>
+        /// Removes outdated and damaged files
+        /// </summary>
+        /// <param name="path">Path to folder</param>
         public static void RemoveOutdatedFiles(string path)
         {
             foreach (var file in GetOutdatedAndDamagedFiles(path))

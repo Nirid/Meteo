@@ -14,7 +14,10 @@ namespace Meteo
         private static readonly string LogPath = $"{LogFolder}\\Log {DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.log";
         private static int WriteNumber = 1;
         private static object SyncObject = new object();
-
+        /// <summary>
+        /// Writes to log.
+        /// </summary>
+        /// <param name="message">String to be written to log</param>
         [Conditional("DEBUG")]
         public static void Log(string message)
         {

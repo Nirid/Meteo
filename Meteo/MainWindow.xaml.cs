@@ -73,10 +73,6 @@ namespace Meteo
             NoInternetTimer = new System.Windows.Threading.DispatcherTimer();
             NoInternetTimer.Tick += NoInternetTimer_Tick;
             NoInternetTimer.Interval = new TimeSpan(0, 1, 0);
-
-            var poznan = Downloader.GetLocation("poznan");
-            var warszawa = Downloader.GetLocation("warszawa");
-
         }
 
         public readonly string FolderPath;
@@ -134,7 +130,10 @@ namespace Meteo
                 return;
             }
         }
-
+        /// <summary>
+        /// Sets image backing WeatherImage to image backed by provided FileSet
+        /// </summary>
+        /// <param name="set">Image source</param>
         private void SetWeatherSource(FileSet set)
         {
             lock (SyncObject2)
@@ -154,14 +153,19 @@ namespace Meteo
                 }
             }
         }
-
+        /// <summary>
+        /// Sets image backing LegendImage
+        /// </summary>
         private void SetLegendSource()
         {
             var uriLegend = new Uri(LegendHandler.LegendPath);
             var uriLegendLocal = new Uri(uriLegend.LocalPath);
-            LegendaImage.Source = new BitmapImage(uriLegendLocal);
+            LegendImage.Source = new BitmapImage(uriLegendLocal);
         }
-
+        /// <summary>
+        /// Sets displayed timeline to provided DateTime
+        /// </summary>
+        /// <param name="date">DateTime to which timeline will be set</param>
         private void SetTimeline(DateTime date)
         {
             TimeLine.Dispatcher.BeginInvoke(new Action(() => { TimeLine.Visibility = Visibility.Visible; }));
@@ -179,16 +183,24 @@ namespace Meteo
             else
                 throw new ArgumentOutOfRangeException();
         }
-
+        /// <summary>
+        /// Forces UpdateTimer_Tick and resets UpdateTimer. If there is noInternetConnection also triggers NoInternetTimerTick
+        /// </summary>
         private void ForceUpdate()
         {
             if (!IsInternetConnection)
+            {
+                NoInternetTimer.Stop();
                 NoInternetTimer_Tick(this, null);
-            UpdateDispatcherTimer_Tick(this, null);
+                NoInternetTimer.Start();
+            }
             UpdateTimer.Stop();
+            UpdateDispatcherTimer_Tick(this, null);
             UpdateTimer.Start();
         }
-
+        /// <summary>
+        /// To be used when SelectedLocation is changed
+        /// </summary>
         private void SelectedLocationChanged()
         {
             UpdateTextbox();
@@ -208,7 +220,11 @@ namespace Meteo
                 SetWeatherSource(first);
             }
         }
-
+        /// <summary>
+        /// Adds Location to Locations list
+        /// </summary>
+        /// <param name="location">Location to be added to list</param>
+        /// <returns>Returns true if location has been added succesfully</returns>
         private bool AddLocation(Location location)
         {
             var all = XManager.AllLocations;
@@ -225,7 +241,11 @@ namespace Meteo
                 return false;
             }
         }
-
+        /// <summary>
+        /// Removes Location form Locations list
+        /// </summary>
+        /// <param name="location">Location to be removed</param>
+        /// <returns>Returns true if removal is succesful</returns>
         private bool RemoveLocation(Location location)
         {
             var all = XManager.AllLocations.ToList();
@@ -240,28 +260,42 @@ namespace Meteo
             }
             return false;
         }
-
+        /// <summary>
+        /// Replaces Location in Location list
+        /// </summary>
+        /// <param name="oldLocation">Location to be replaced</param>
+        /// <param name="newLocation">Location replacing oldLocation</param>
+        /// <returns>Returns true if replacment is succesful</returns>
         private bool ReplaceLocation(Location oldLocation,Location newLocation)
         {
             var all = XManager.AllLocations.ToList();
-            if (all.Contains(oldLocation) && oldLocation != XManager.LastLocation && !all.Contains(newLocation) && !all.Any(x => x.Name.Trim(' ').ToLower() == newLocation.Name.Trim(' ').ToLower()))
+            if (all.Contains(oldLocation) && oldLocation != XManager.LastLocation)
             {
-                var index = all.IndexOf(oldLocation);
-                all.Remove(oldLocation);
-                all.Insert(index, newLocation);
-                XManager.UpdateLocations(all);
-                Locations = new ObservableCollection<Location>(all);
-                CityList.ItemsSource = Locations;
-                CityList.SelectedIndex = index;
-                return true;
+                var tempAll = all.ToList();
+                tempAll.Remove(oldLocation);
+                if (!tempAll.Contains(newLocation) && !tempAll.Any(x => x.Name.Trim(' ').ToLower() == newLocation.Name.Trim(' ').ToLower()))
+                {
+                    var index = all.IndexOf(oldLocation);
+                    all.Remove(oldLocation);
+                    all.Insert(index, newLocation);
+                    XManager.UpdateLocations(all);
+                    Locations = new ObservableCollection<Location>(all);
+                    CityList.ItemsSource = null;
+                    CityList.ItemsSource = Locations;
+                    CityList.SelectedIndex = index;
+                    return true;
+                }
             }
             return false;
         }
-
+        /// <summary>
+        /// Checks if there are any Locations with Update == true which can be updated
+        /// </summary>
         private void CheckForNewestWeatherFiles()
         {
             //For every location in AllLocations find Filesets in Files that have the same location then set Update property to be the same as AllLoctions Update property
-            XManager.AllLocations.Select(location => (location, Files.Where(y => y.Location == location))).ToList().ForEach(x => x.Item2.ToList().ForEach(y => y.Location.Update = x.location.Update));
+            XManager.AllLocations.Select(location => (location, Files.Where(y => y.Location == location))).ToList()
+                .ForEach(x => x.Item2.ToList().ForEach(y => { y.Location.Update = x.location.Update; y.Location.Name = x.location.Name; }));
 
             //Take newest file for every location, if it isn't newest file download it
             var updateableFiles = from file in Files
@@ -283,13 +317,16 @@ namespace Meteo
             foreach (var location in fromXml)
                 Files.Add(new FileSet(location, NewestWeatherDate, FileSet.DownloadStatus.ToBeDownloaded));
         }
-
+        /// <summary>
+        /// Fires when list of Locations is modified to update XML backing this list
+        /// </summary>
         private void OnUpdateLocations(object Sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            Logging.Log(Sender.GetType().ToString() + " | " + e.Action.ToString());
             XManager.UpdateLocations(Locations);
         }
-
+        /// <summary>
+        /// Fires when Weather file is downloaded
+        /// </summary>
         private void OnWeatherFileDownloaded(object sender, EventArgs e)
         {
             lock (SyncObject)
@@ -318,19 +355,25 @@ namespace Meteo
                 }
             }
         }
-
+        /// <summary>
+        /// Fires when Legend is downloaded
+        /// </summary>
         private void OnLegendDownloaded(object sender, EventArgs e)
         {
             SetLegendSource();
         }
-
+        /// <summary>
+        /// Fires when interent connection is lost
+        /// </summary>
         private void OnNoInternetConnection(object sender, EventArgs e)
         {
             IsInternetConnection = false;
             RefreshButton.Dispatcher.BeginInvoke(new Action(() => { RefreshButton.Background = Brushes.Red; }));
             NoInternetTimer.Start();
         }
-
+        /// <summary>
+        /// Fires when interent connetion is restored
+        /// </summary>
         private void OnInternetConnection(object sender, EventArgs e)
         {
             IsInternetConnection = true;

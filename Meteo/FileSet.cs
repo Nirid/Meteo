@@ -72,6 +72,11 @@ namespace Meteo
             }
         }
 
+        public override string ToString()
+        {
+            return $"{this.Location.Name} X:{this.Location.X} Y:{this.Location.Y} {this.Location.Update} | {this.Status.ToString()} | {this.Date.ToString()}";
+        }
+
         public bool CompareLocationAndDate(FileSet other)
         {
             return this.Location == other.Location && this.Date == other.Date;

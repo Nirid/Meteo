@@ -18,7 +18,7 @@
         </Grid.Resources>
 
         <Image Margin="450,0,0,10" x:Name="WeatherImage" Height="660" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="630"/>
-        <Image x:Name="LegendaImage" Height="660" VerticalAlignment="Top" RenderTransformOrigin="1.705,0.498" HorizontalAlignment="Right" Width="280" Margin="0,0,640,0"/>
+        <Image x:Name="LegendImage" Height="660" VerticalAlignment="Top" RenderTransformOrigin="1.705,0.498" HorizontalAlignment="Right" Width="280" Margin="0,0,640,0"/>
         <Line x:Name="TimeLine" X1="520" Y1="57" X2="520" Y2="604" Stroke="Red" StrokeThickness="1" Visibility="Hidden" />
         <Button x:Name="RefreshButton" Content="Odśwież" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="155" Background="LimeGreen" Click="RefreshButton_Click"/>
         <ComboBox x:Name="CityList" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CityList_SelectionChanged" />

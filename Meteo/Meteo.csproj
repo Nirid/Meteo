@@ -69,10 +69,17 @@
     <Compile Include="FolderHandler.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="LegendHandler.cs" />
+    <Compile Include="ListWindow.xaml.cs">
+      <DependentUpon>ListWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TaskbarIcon\Close.cs" />
     <Compile Include="TaskbarIcon\Hide.cs" />
     <Compile Include="XMLManager.cs" />
     <Page Include="EditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ListWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

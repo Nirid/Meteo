@@ -138,14 +138,14 @@ namespace Meteo
 
         private void LocatonEditButton_Click(object sender, RoutedEventArgs e)
         {
-            var editWindow = new EditWindow(SelectedLocation, true);
+            var editWindow = new EditWindow(SelectedLocation,XManager.AllLocations, true);
             var result = editWindow.ShowDialog();
             var location = editWindow.InitialLocation;
             if (result == true)
             {
                 if(!ReplaceLocation(SelectedLocation, location))
                 {
-                    //TODO: Error massage
+                    MessageBox.Show("Nie można zamienić domyślnej lokalizacji, zmień domyślną lokalizację a następnie zedytuj ponownie", "Błąd");
                 }
             }
         }
