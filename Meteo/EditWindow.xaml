@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:Meteo"
         mc:Ignorable="d"
         Title="Edycja Lokacji" Height="280" Width="230" ResizeMode="NoResize"
-        MouseDown="MainWindow_MouseDown">
+        MouseDown="MainWindow_MouseDown" ShowInTaskbar="False">
     <Grid x:Name="MainGrid">
         <TextBox x:Name="NameTextBox" LostKeyboardFocus="NameTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="20" Margin="58,14,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="144"/>
         <Label Content="Nazwa:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>

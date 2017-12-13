@@ -108,10 +108,10 @@ namespace Meteo
             double lat = position.Latitude; //E-W
             double lon = position.Longitude; //S-N
             //Equations from multiple polynomial regression of GPS data to location data http://www.xuru.org/rt/MPR.asp
-            double X = -5.717114996 * 0.00001 * lon * lon * lon - 4.666954368 * 0.000001 * lon * lon * lat - 4.915961914 * 0.00001 * lon * lat * lat - 1.010349445 * 0.00001 * lat * lat * lat
-                + 3.578943599 * 0.001 * lon * lon - 4.964606815 * 0.01 * lon * lat + 2.635647828 * 0.001 * lat * lat + 5.091380838 * lon + 0.866611182 * lat - 68.26117676;
-            double Y = -8.79278964 * 0.000001 * lon * lon * lon + 3.932780099 * 0.0001 * lon * lon * lat - 3.981124124 * 0.0000001 * lon * lat * lat + 1.188301147 * 0.00001 * lat * lat * lat
-            - 3.682281501 * 0.01 * lon * lon - 1.506658693 * 0.01 * lon * lat - 2.016991693 * 0.001 * lat * lat + 1.426927733 * lon - 3.710854995 * lat + 246.7869373;
+            double X = -5.717114996 * 0.00001 * lat * lat * lat - 4.666954368 * 0.000001 * lat * lat * lon - 4.915961914 * 0.00001 * lat * lon * lon - 1.010349445 * 0.00001 * lon * lon * lon
+                + 3.578943599 * 0.001 * lat * lat - 4.964606815 * 0.01 * lat * lon + 2.635647828 * 0.001 * lon * lon + 5.091380838 * lat + 0.866611182 * lon - 68.26117676;
+            double Y = -8.79278964 * 0.000001 * lat * lat * lat + 3.932780099 * 0.0001 * lat * lat * lon - 3.981124124 * 0.0000001 * lat * lon * lon + 1.188301147 * 0.00001 * lon * lon * lon
+            - 3.682281501 * 0.01 * lat * lat - 1.506658693 * 0.01 * lat * lon - 2.016991693 * 0.001 * lon * lon + 1.426927733 * lat - 3.710854995 * lon + 246.7869373;
             if (X < 0)
                 X = 0;
             else if (X > 59)
@@ -138,14 +138,14 @@ namespace Meteo
         public static GeoCoordinate LocationToGPS(Location location)
         {
             double x = (location.X - 17)/7;
-            double y = (location.Y-17)/7;
+            double y = (location.Y - 17)/7;
             //Equations from multiple polynomial regression of location data to GPS data http://www.xuru.org/rt/MPR.asp
-            double lon = -1.899951859 * 0.0000001 * x * x * x + 4.855492035 * 0.000001 * x * x * y - 3.781221562 * 0.00000001 * x * y * y + 6.765459654 * 0.00000001 * y * y * y
+            double lat = -1.899951859 * 0.0000001 * x * x * x + 4.855492035 * 0.000001 * x * x * y - 3.781221562 * 0.00000001 * x * y * y + 6.765459654 * 0.00000001 * y * y * y
                 - 9.792127456 * 0.0001 * x * x - 2.799965842 * 0.0001 * x * y - 2.083901458 * 0.00001 * y * y + 5.771826024 * 0.01 * x - 2.465070465 * 0.1 * y + 65.31579252;
-            double lat = -7.038030331 * 0.000001 * x * x * x - 2.776812041 * 0.00000001 * x * x * y + 1.850255915 * 0.00001 * x * y * y - 1.477786334 * 0.0000001 * y * y * y
+            double lon = -7.038030331 * 0.000001 * x * x * x - 2.776812041 * 0.00000001 * x * x * y + 1.850255915 * 0.00001 * x * y * y - 1.477786334 * 0.0000001 * y * y * y
                 + 6.173254459 * 0.0001 * x * x - 4.399831048 * 0.001 * x * y - 5.214404811 * 0.0001 * y * y + 5.801376282 * 0.1 * x + 1.279015405 * 0.1 * y + 2.004273716;
 
-            return new GeoCoordinate(lat, lon);
+            return new GeoCoordinate(lat,lon);
         }
 
         public static bool operator ==(Location f1, Location f2)

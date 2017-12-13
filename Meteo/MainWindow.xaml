@@ -22,12 +22,22 @@
         <Image x:Name="LegendImage" Height="660" VerticalAlignment="Top" RenderTransformOrigin="1.705,0.498" HorizontalAlignment="Right" Width="280" Margin="0,0,640,0"/>
         <Line x:Name="TimeLine" X1="520" Y1="57" X2="520" Y2="604" Stroke="Red" StrokeThickness="1" Visibility="Hidden" />
         <Button x:Name="RefreshButton" Content="Odśwież" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="155" Background="LimeGreen" Click="RefreshButton_Click"/>
-        <ComboBox x:Name="CityList" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CityList_SelectionChanged" />
-        <CheckBox x:Name="AutoUpdateCheckbox" Content="Aktualizuj automatycznie" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="155" Checked="AutoUpdateCheckbox_Checked" Unchecked="AutoUpdateCheckbox_Unchecked"/>
-        <Button x:Name="SetDefaultButton" Content="Ustaw jako domyślne" HorizontalAlignment="Left" Margin="10,114,0,0" VerticalAlignment="Top" Width="155" RenderTransformOrigin="0.427,0.9" Click="SetDefaultButton_Click"/>
-        <Button x:Name="LocatonEditButton" Content="Edytuj lokalizację" HorizontalAlignment="Left" Margin="10,139,0,0" VerticalAlignment="Top" Width="155" Click="LocatonEditButton_Click"/>
-        <Button x:Name="RemoveLocationButton" Content="Usuń lokalizację" HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" Width="155" Click="RemoveLocationButton_Click"/>
-        <Label Content="Miejsce:" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="CityList" HorizontalAlignment="Left" Margin="10,76,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CityList_SelectionChanged" />
+        <TextBlock Margin="10,103,925,548">           
+            <Hyperlink NavigateUri="http://www.google.com/maps/place" RequestNavigate="Hyperlink_RequestNavigate">
+                Sprawdź miejsce na mapie
+            </Hyperlink>
+        </TextBlock>
+        <CheckBox x:Name="AutoUpdateCheckbox" Content="Aktualizuj automatycznie" HorizontalAlignment="Left" Margin="10,122,0,0" VerticalAlignment="Top" Width="155" Checked="AutoUpdateCheckbox_Checked" Unchecked="AutoUpdateCheckbox_Unchecked"/>
+        <Button x:Name="SetDefaultButton" Content="Ustaw jako domyślne" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top" Width="155" RenderTransformOrigin="0.427,0.9" Click="SetDefaultButton_Click"/>
+        <Button x:Name="LocatonEditButton" Content="Edytuj lokalizację" HorizontalAlignment="Left" Margin="10,167,0,0" VerticalAlignment="Top" Width="155" Click="LocatonEditButton_Click"/>
+        <Button x:Name="RemoveLocationButton" Content="Usuń lokalizację" HorizontalAlignment="Left" Margin="10,192,0,0" VerticalAlignment="Top" Width="155" Click="RemoveLocationButton_Click"/>
+        <Label Content="Miejsce:" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="CreateLocationComboBox" HorizontalAlignment="Left" Margin="10,263,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CreateLocationComboBox_SelectionChanged">
+            <System:String>Z nazwy</System:String>
+            <System:String>Podaj koordynaty</System:String>
+        </ComboBox>
+        <Label Content="Dodaj miejsce:" HorizontalAlignment="Left" Margin="10,232,0,0" VerticalAlignment="Top"/>
 
         <tb:TaskbarIcon x:Name="Notifycation" IconSource="Resources/icon.ico" ToolTipText="Meteo App" 
                         LeftClickCommand="{StaticResource Show}" LeftClickCommandParameter="{x:Reference Name=window}">
@@ -45,11 +55,7 @@
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
-        <ComboBox x:Name="CreateLocationComboBox" HorizontalAlignment="Left" Margin="10,263,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CreateLocationComboBox_SelectionChanged">
-            <System:String>Z nazwy</System:String>
-            <System:String>Podaj koordynaty</System:String>
-        </ComboBox>
-        <Label Content="Dodaj miejsce:" HorizontalAlignment="Left" Margin="10,232,0,0" VerticalAlignment="Top"/>
+
 
 
 

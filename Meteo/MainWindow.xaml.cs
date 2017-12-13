@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.Diagnostics;
+using System.Windows.Navigation;
 
 namespace Meteo
 {
