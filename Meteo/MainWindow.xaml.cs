@@ -172,12 +172,12 @@ namespace Meteo
             double LeftDistance = WeatherImage.Dispatcher.Invoke(new Func<double>(() => { return WeatherImage.Margin.Left; }));
             if (date.TimeOfDay == new TimeSpan(0, 0, 0) || date.TimeOfDay == new TimeSpan(12, 0, 0))
             {
-                LeftDistance += 69.0 + 6.40278 * (DateTime.Now - date).TotalHours;
+                LeftDistance += 69.0 + 6.40278 * (DateTime.Now - date.AddHours(2)).TotalHours;
                 TimeLine.Dispatcher.BeginInvoke(new Action(() => { TimeLine.X1 = TimeLine.X2 = LeftDistance; }));
             }
             else if (date.TimeOfDay == new TimeSpan(6, 0, 0) || date.TimeOfDay == new TimeSpan(18, 0, 0))
             {
-                LeftDistance += 63 + 7.04167 * (DateTime.Now - date).TotalHours; ;
+                LeftDistance += 63 + 7.04167 * (DateTime.Now - date.AddHours(2)).TotalHours; ;
                 TimeLine.Dispatcher.BeginInvoke(new Action(() => { TimeLine.X1 = TimeLine.X2 = LeftDistance; }));
             }
             else
@@ -203,7 +203,6 @@ namespace Meteo
         /// </summary>
         private void SelectedLocationChanged()
         {
-            UpdateTextbox();
             var other = Files.Where(x => x.Location == SelectedLocation && (x.Status == FileSet.DownloadStatus.Downloaded || x.Status == FileSet.DownloadStatus.IsDisplayed)).OrderByDescending(x => x.Date).ToList();
             if (other.Count == 0)
             {

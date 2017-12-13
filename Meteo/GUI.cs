@@ -17,65 +17,10 @@ namespace Meteo
             ForceUpdate();
         }
 
-        private void ManualMode_Checked(object sender, RoutedEventArgs e)
-        {
-            YTextbox.IsEnabled = true;
-            XTextbox.IsEnabled = true;
-            SaveNewLocalizationButton.IsEnabled = true;
-            SetLocalizationButton.IsEnabled = true;
-            NewLocalizationNameTextbox.IsEnabled = true;
-            UpdateTextbox();
-        }
-
-        private void ManualMode_Unchecked(object sender, RoutedEventArgs e)
-        {
-            YTextbox.IsEnabled = false;
-            XTextbox.IsEnabled = false;
-            SaveNewLocalizationButton.IsEnabled = false;
-            SetLocalizationButton.IsEnabled = false;
-            NewLocalizationNameTextbox.IsEnabled = false;
-        }
-
-        private void UpdateTextbox()
-        {
-            if (ManualMode.IsChecked == true)
-            {
-                XTextbox.Text = SelectedLocation.X.ToString();
-                YTextbox.Text = SelectedLocation.Y.ToString();
-            }
-        }
-
-        private void SetLocalizationButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (ManualMode.IsChecked.Value)
-            {
-                if (int.TryParse(YTextbox.Text, out var Y) && int.TryParse(XTextbox.Text, out var X))
-                {
-                    var loc = Location.SnapToGrid(X, Y);
-                    SelectedLocation = new Location(loc.X, loc.Y);
-                    SelectedLocationChanged();
-                }
-            }
-        }
-
         private void SetDefaultButton_Click(object sender, RoutedEventArgs e)
         {
             XManager.SetLastLocation((Location)CityList.SelectedItem);
             SetDefaultButton.IsEnabled = false;
-        }
-
-        private void SaveNewLocalizationButton_Click(object sender, RoutedEventArgs e)
-        {
-            string name = NewLocalizationNameTextbox.Text;
-            if (int.TryParse(YTextbox.Text, out var Y) && int.TryParse(XTextbox.Text, out var X))
-            {
-                var loc = Location.SnapToGrid(X, Y);
-                var location = new Location(name, loc.X, loc.Y);
-                if(!AddLocation(location))
-                {
-                    MessageBox.Show("Lokalizacja o identycznej nazwie lub położeniu już istnieje", "Błąd");
-                }
-            }
         }
 
         private void AutoUpdateCheckbox_Checked(object sender, RoutedEventArgs e)
@@ -147,6 +92,27 @@ namespace Meteo
                 {
                     MessageBox.Show("Nie można zamienić domyślnej lokalizacji, zmień domyślną lokalizację a następnie zedytuj ponownie", "Błąd");
                 }
+            }
+        }
+
+        private void CreateLocationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CreateLocationComboBox.SelectedIndex == 1)
+            {
+                var location = new Location("", XManager.LastLocation.X, XManager.LastLocation.Y, false);
+                var editWindow = new EditWindow(location, XManager.AllLocations, false);
+                var result = editWindow.ShowDialog();
+                var choosenLocation = editWindow.InitialLocation;
+                if (result == true)
+                {
+                    if (!AddLocation(choosenLocation))
+                    {
+                        MessageBox.Show("Nie można zamienić domyślnej lokalizacji, zmień domyślną lokalizację a następnie zedytuj ponownie", "Błąd");
+                        return;
+                    }
+                }
+                CreateLocationComboBox.SelectedIndex = -1;
+                CityList.SelectedItem = choosenLocation;
             }
         }
 

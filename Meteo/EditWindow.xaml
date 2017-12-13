@@ -6,27 +6,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Meteo"
         mc:Ignorable="d"
-        Title="Edycja Lokacji" Height="250" Width="230" ResizeMode="NoResize"
+        Title="Edycja Lokacji" Height="280" Width="230" ResizeMode="NoResize"
         MouseDown="MainWindow_MouseDown">
     <Grid x:Name="MainGrid">
         <TextBox x:Name="NameTextBox" LostKeyboardFocus="NameTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="20" Margin="58,14,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="144"/>
         <Label Content="Nazwa:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <Label Content="Lokalizacja:" HorizontalAlignment="Left" Margin="73,44,0,0" VerticalAlignment="Top"/>
-        <Line X1="0" Y1="42" X2="300" Y2="42" Stroke="Black" StrokeThickness="2" />
-        <Label Content="Koordynaty:" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
-        <Line X1="0" Y1="72" X2="300" Y2="72" Stroke="Black" StrokeThickness="2" />
-        <Line X1="110" Y1="72" X2="110" Y2="175" Stroke="Black" StrokeThickness="2" />
-        <Line X1="0" Y1="175" X2="300" Y2="175" Stroke="Black" StrokeThickness="2" />
-        <Label Content="GPS:" HorizontalAlignment="Left" Margin="120,75,0,0" VerticalAlignment="Top"/>
-        <Label Content="X:" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top"/>
-        <Label Content="Y:" HorizontalAlignment="Left" Margin="10,134,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="LocationXTextBox" LostKeyboardFocus="LocationXTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="30,106,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
-        <TextBox x:Name="LocationYTextBox" LostKeyboardFocus="LocationYTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="30,137,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
-        <Label Content="E:" HorizontalAlignment="Left" Margin="120,103,0,0" VerticalAlignment="Top"/>
-        <Label Content="N:" HorizontalAlignment="Left" Margin="120,134,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="LocationETextBox" LostKeyboardFocus="LocationETextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="142,106,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
-        <TextBox x:Name="LocationNTextBox" LostKeyboardFocus="LocationNTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="142,137,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
-        <Button x:Name="ConfirmButton" Content="Potwierdź" HorizontalAlignment="Left" Margin="10,182,0,0" VerticalAlignment="Top" Width="80" Click="ConfirmButton_Click"/>
-        <Button x:Name="CancelButton" Content="Anuluj" HorizontalAlignment="Left" Margin="120,182,0,0" VerticalAlignment="Top" Width="82" Click="CancelButton_Click"/>
+        <CheckBox x:Name="UpdateCheckBox" Content="Odświeżanie" HorizontalAlignment="Left" Margin="69,41,0,0" VerticalAlignment="Top" Checked="UpdateCheckBox_Checked" Unchecked="UpdateCheckBox_Unchecked"/>
+        <Label Content="Lokalizacja:" HorizontalAlignment="Left" Margin="81,64,0,0" VerticalAlignment="Top"/>
+        <Line X1="0" Y1="63" X2="300" Y2="63" Stroke="Black" StrokeThickness="2" />
+        <Label Content="Koordynaty:" HorizontalAlignment="Left" Margin="18,90,0,0" VerticalAlignment="Top"/>
+        <Line X1="0" Y1="90" X2="300" Y2="90" Stroke="Black" StrokeThickness="2" />
+        <Line X1="110" Y1="90" X2="110" Y2="185" Stroke="Black" StrokeThickness="2" />
+        <Line X1="0" Y1="185" X2="300" Y2="185" Stroke="Black" StrokeThickness="2" />
+        <Label Content="GPS:" HorizontalAlignment="Left" Margin="128,93,0,0" VerticalAlignment="Top"/>
+        <Label Content="X:" HorizontalAlignment="Left" Margin="18,121,0,0" VerticalAlignment="Top"/>
+        <Label Content="Y:" HorizontalAlignment="Left" Margin="18,152,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="LocationXTextBox" LostKeyboardFocus="LocationXTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="38,124,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
+        <TextBox x:Name="LocationYTextBox" LostKeyboardFocus="LocationYTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="38,155,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
+        <Label Content="E:" HorizontalAlignment="Left" Margin="128,121,0,0" VerticalAlignment="Top"/>
+        <Label Content="N:" HorizontalAlignment="Left" Margin="128,152,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="LocationETextBox" LostKeyboardFocus="LocationETextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="150,124,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
+        <TextBox x:Name="LocationNTextBox" LostKeyboardFocus="LocationNTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="150,155,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
+        <Button x:Name="ConfirmButton" Content="Potwierdź" HorizontalAlignment="Left" Margin="18,200,0,0" VerticalAlignment="Top" Width="80" Click="ConfirmButton_Click"/>
+        <Button x:Name="CancelButton" Content="Anuluj" HorizontalAlignment="Left" Margin="128,200,0,0" VerticalAlignment="Top" Width="82" Click="CancelButton_Click"/>
+        
     </Grid>
 </Window>

@@ -55,7 +55,7 @@ namespace Meteo
                 MessageBox.Show("Lokalizacja o tych koordynatach już istnieje", "Błąd");
                 return;
             }
-            InitialLocation = new Location(CurrentLocation.Name, CurrentLocation.X, CurrentLocation.Y, InitialLocation.Update);
+            InitialLocation = new Location(CurrentLocation.Name, CurrentLocation.X, CurrentLocation.Y, CurrentLocation.Update);
             DialogResult = true;
             this.Close();
         }
@@ -70,6 +70,7 @@ namespace Meteo
         private void UpdateTextBoxes(Location location)
         {
             NameTextBox.Text = location.Name;
+            UpdateCheckBox.IsChecked = location.Update;
             LocationXTextBox.Text = location.X.ToString();
             LocationYTextBox.Text = location.Y.ToString();
             LocationETextBox.Text = Math.Round(CurrentCoordinate.Latitude, 2).ToString();
@@ -161,16 +162,15 @@ namespace Meteo
 
         private void NameTextBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (NameTextBox.Text.Length < 1 || AllLocations.Any(x => x.Name == CurrentLocation.Name))
+            if (NameTextBox.Text.Length < 1 || AllLocations.Any(x => x.Name == NameTextBox.Text))
             {
                 MessageBox.Show("Nazwa musi być unikalna", "Błąd");
-                UpdateTextBoxes(CurrentLocation);
             }
             else
             {
                 CurrentLocation.Name = NameTextBox.Text;
             }
-            
+            UpdateTextBoxes(CurrentLocation);
         }
 
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -178,5 +178,14 @@ namespace Meteo
             Keyboard.ClearFocus();
         }
 
+        private void UpdateCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            CurrentLocation.Update = true;
+        }
+
+        private void UpdateCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            CurrentLocation.Update = false;
+        }
     }
 }
