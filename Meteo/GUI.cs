@@ -121,8 +121,7 @@ namespace Meteo
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            var coordinate = Location.LocationToGPS(SelectedLocation);
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri + $"/{coordinate.Latitude.ToString(CultureInfo.InvariantCulture)},{coordinate.Longitude.ToString(CultureInfo.InvariantCulture)}"));
+            MapGenerator.DisplayLocation(SelectedLocation);
             e.Handled = true;
         }
 

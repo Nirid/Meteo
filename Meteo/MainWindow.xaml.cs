@@ -37,6 +37,7 @@ namespace Meteo
             XManager = new XMLManager(FolderPath);
             Handler = new FileHandler(FolderPath);
             LegendHandler = new LegendHandler(FolderPath);
+            MapGen = new MapGenerator(FolderPath);
 
             Files = FileHandler.FileList;
             //TODO: sprawdizić które się pokrywają z lokacjami z XManager AllLocations i ustawić name i Update odpowiednio
@@ -69,7 +70,7 @@ namespace Meteo
 
             CleanupTimer = new System.Windows.Threading.DispatcherTimer();
             CleanupTimer.Tick += CleanupDispatcherTimer_Tick;
-            CleanupTimer.Interval = new TimeSpan(0, 0, 5);
+            CleanupTimer.Interval = new TimeSpan(0, 15, 0);
             CleanupTimer.Start();
 
             NoInternetTimer = new System.Windows.Threading.DispatcherTimer();
@@ -81,6 +82,7 @@ namespace Meteo
         private XMLManager XManager;
         private FileHandler Handler;
         private LegendHandler LegendHandler;
+        private MapGenerator MapGen;
         private ObservableCollection<Location> Locations;
         private System.Windows.Threading.DispatcherTimer UpdateTimer;
         private System.Windows.Threading.DispatcherTimer CleanupTimer;
@@ -107,6 +109,7 @@ namespace Meteo
         {
             if (!Files.Any(x => x.Status == FileSet.DownloadStatus.ToBeDownloaded || x.Status == FileSet.DownloadStatus.ToBeDeleted))
                 FileHandler.RemoveOutdatedFiles(FolderPath);
+            MapGenerator.Cleanup(FolderPath);
         }
 
         private void NoInternetTimer_Tick(object sender, EventArgs e)
