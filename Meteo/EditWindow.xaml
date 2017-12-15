@@ -27,7 +27,7 @@
         <Label Content="N:" HorizontalAlignment="Left" Margin="128,152,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="LocationETextBox" LostKeyboardFocus="LocationETextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="150,124,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
         <TextBox x:Name="LocationNTextBox" LostKeyboardFocus="LocationNTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="150,155,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
-        <TextBlock x:Name="ShowLocationTextBlock" HorizontalAlignment="Left" Margin="38,196,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172"/>
+        <TextBlock x:Name="ShowLocationTextBlock" HorizontalAlignment="Left" Margin="38,196,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172" MouseEnter="ShowLocationTextBlock_MouseEnter" />
         <Button x:Name="ConfirmButton" Content="Potwierdź" HorizontalAlignment="Left" Margin="18,221,0,0" VerticalAlignment="Top" Width="80" Click="ConfirmButton_Click"/>
         <Button x:Name="CancelButton" Content="Anuluj" HorizontalAlignment="Left" Margin="128,221,0,0" VerticalAlignment="Top" Width="82" Click="CancelButton_Click"/>
 

@@ -81,6 +81,7 @@ namespace Meteo
             LocationYTextBox.Text = location.Y.ToString();
             LocationETextBox.Text = Math.Round(CurrentCoordinate.Latitude, 2).ToString();
             LocationNTextBox.Text = Math.Round(CurrentCoordinate.Longitude, 2).ToString();
+            ShowLocationTextBlock.Text = "";
             Hyperlink link = new Hyperlink();
             var filename = MapGenerator.CreateAndSave(location);
             link.NavigateUri = new Uri(filename);
@@ -198,6 +199,11 @@ namespace Meteo
         private void UpdateCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             CurrentLocation.Update = false;
+        }
+
+        private void ShowLocationTextBlock_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Keyboard.ClearFocus();
         }
     }
 }
