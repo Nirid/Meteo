@@ -6,8 +6,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Meteo"
         mc:Ignorable="d"
-        Title="Edycja Lokacji" Height="280" Width="230" ResizeMode="NoResize"
-        MouseDown="MainWindow_MouseDown" ShowInTaskbar="False">
+        Title="Edycja Lokacji" Height="287.96" Width="230" ResizeMode="NoResize"
+        MouseDown="MainWindow_MouseDown">
     <Grid x:Name="MainGrid">
         <TextBox x:Name="NameTextBox" LostKeyboardFocus="NameTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="20" Margin="58,14,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="144"/>
         <Label Content="Nazwa:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
@@ -27,8 +27,11 @@
         <Label Content="N:" HorizontalAlignment="Left" Margin="128,152,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="LocationETextBox" LostKeyboardFocus="LocationETextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="150,124,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
         <TextBox x:Name="LocationNTextBox" LostKeyboardFocus="LocationNTextBox_LostKeyboardFocus" HorizontalAlignment="Left" Height="23" Margin="150,155,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="60"/>
-        <Button x:Name="ConfirmButton" Content="Potwierdź" HorizontalAlignment="Left" Margin="18,200,0,0" VerticalAlignment="Top" Width="80" Click="ConfirmButton_Click"/>
-        <Button x:Name="CancelButton" Content="Anuluj" HorizontalAlignment="Left" Margin="128,200,0,0" VerticalAlignment="Top" Width="82" Click="CancelButton_Click"/>
-        
+        <TextBlock x:Name="ShowLocationTextBlock" HorizontalAlignment="Left" Margin="38,196,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="172"/>
+        <Button x:Name="ConfirmButton" Content="Potwierdź" HorizontalAlignment="Left" Margin="18,221,0,0" VerticalAlignment="Top" Width="80" Click="ConfirmButton_Click"/>
+        <Button x:Name="CancelButton" Content="Anuluj" HorizontalAlignment="Left" Margin="128,221,0,0" VerticalAlignment="Top" Width="82" Click="CancelButton_Click"/>
+
+
+
     </Grid>
 </Window>

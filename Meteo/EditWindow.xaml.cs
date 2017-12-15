@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Meteo
@@ -35,6 +36,11 @@ namespace Meteo
             InitialLocation = location;
             CurrentLocation = new Location(location.Name, location.X, location.Y, location.Update);
             UpdateTextBoxes(location);
+        }
+
+        private void Link_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.Uri.ToString());
         }
 
         public Location InitialLocation;
@@ -75,6 +81,12 @@ namespace Meteo
             LocationYTextBox.Text = location.Y.ToString();
             LocationETextBox.Text = Math.Round(CurrentCoordinate.Latitude, 2).ToString();
             LocationNTextBox.Text = Math.Round(CurrentCoordinate.Longitude, 2).ToString();
+            Hyperlink link = new Hyperlink();
+            var filename = MapGenerator.CreateAndSave(location);
+            link.NavigateUri = new Uri(filename);
+            link.RequestNavigate += Link_RequestNavigate;
+            link.Inlines.Add("Sprawdź miejsce na mapie");
+            ShowLocationTextBlock.Inlines.Add(link);
         }
 
         private Location ReadLocation()

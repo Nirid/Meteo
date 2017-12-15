@@ -156,7 +156,6 @@ namespace Meteo
                     this.FoundLocation = null;
                 }
             }
-
         }
 
         private void Link_RequestNavigate(object sender, RequestNavigateEventArgs e)
