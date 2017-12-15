@@ -55,10 +55,17 @@
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
-
-
-
-
+        <Border x:Name="SearchGridBorder"  HorizontalAlignment="Left" VerticalAlignment="Top"  BorderBrush="Black" BorderThickness="2" Width="170" Margin="0,318,0,0" Height="226" Visibility="Hidden">
+            <Grid x:Name="SearchGrid"  HorizontalAlignment="Right" Width="170" >
+                <Label Content="Wpisz nazwę miejsca:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="SearchTextBox" HorizontalAlignment="Left" Height="23" Margin="10,41,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="150"/>
+                <Button x:Name="SearchButton" Content="Szukaj" HorizontalAlignment="Left" Margin="10,69,0,0" VerticalAlignment="Top" Width="150" Click="SearchButton_Click"/>
+                <TextBlock x:Name="SearchResultTextBlock" HorizontalAlignment="Left" Margin="10,94,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="150" Height="34" Visibility="Visible"/>
+                <Label Content="Zapisz pod nazwą:" HorizontalAlignment="Left" Margin="13,133,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="SearchResultNameTextBox" HorizontalAlignment="Left" Height="23" Margin="13,164,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="147" RenderTransformOrigin="0.503,1.783"/>
+                <Button x:Name="SearchResultSaveButton" Content="Zapisz" HorizontalAlignment="Left" Margin="13,192,0,0" VerticalAlignment="Top" Width="147" Click="SearchResultSaveButton_Click"/>
+            </Grid>
+        </Border>
 
 
 

@@ -25,6 +25,11 @@ namespace Meteo
                     GenerateHtml(Location.LocationToGPS(location))));
         }
 
+        public static string CreateAndSave(Location location)
+        {
+            return SaveHtml(GenerateHtml(Location.LocationToGPS(location)));
+        }
+
         static void OpenBrowser(string fileName)
         {
             System.Diagnostics.Process.Start(fileName);
@@ -32,7 +37,7 @@ namespace Meteo
 
         static string SaveHtml(string html)
         {
-            string fileName = FolderPath + "/T" + DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture) + ".html";
+            string fileName = FolderPath + "\\T" + DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture) + ".html";
             File.WriteAllText(fileName,html);
             return fileName;
         }

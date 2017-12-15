@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Navigation;
 
 namespace Meteo
@@ -86,12 +87,12 @@ namespace Meteo
 
         private void LocatonEditButton_Click(object sender, RoutedEventArgs e)
         {
-            var editWindow = new EditWindow(SelectedLocation,XManager.AllLocations, true);
+            var editWindow = new EditWindow(SelectedLocation, XManager.AllLocations, true);
             var result = editWindow.ShowDialog();
             var location = editWindow.InitialLocation;
             if (result == true)
             {
-                if(!ReplaceLocation(SelectedLocation, location))
+                if (!ReplaceLocation(SelectedLocation, location))
                 {
                     MessageBox.Show("Nie można zamienić domyślnej lokalizacji, zmień domyślną lokalizację a następnie zedytuj ponownie", "Błąd");
                 }
@@ -100,7 +101,13 @@ namespace Meteo
 
         private void CreateLocationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (CreateLocationComboBox.SelectedIndex == 1)
+            if(CreateLocationComboBox.SelectedIndex == 0)
+            {
+                SearchGridBorder.Visibility = Visibility.Visible;
+                SearchResultNameTextBox.Text = "";
+                FoundLocation = null;
+            }
+            else if (CreateLocationComboBox.SelectedIndex == 1)
             {
                 var location = new Location("", XManager.LastLocation.X, XManager.LastLocation.Y, false);
                 var editWindow = new EditWindow(location, XManager.AllLocations, false);
@@ -123,6 +130,74 @@ namespace Meteo
         {
             MapGenerator.DisplayLocation(SelectedLocation);
             e.Handled = true;
+        }
+
+        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            SearchResultNameTextBox.Text = "";
+            if (SearchTextBox.Text.Count() > 0)
+            {
+                var FoundLoaction = Downloader.GetLocation(SearchTextBox.Text);
+                if (FoundLoaction != null)
+                {
+                    SearchResultTextBlock.Text = "Znaleziono lokalizację\n";
+                    Hyperlink link = new Hyperlink();
+                    var filename = MapGenerator.CreateAndSave(FoundLoaction);
+                    link.NavigateUri = new Uri(filename);
+                    link.RequestNavigate += Link_RequestNavigate;
+                    link.Inlines.Add("Sprawdź miejsce na mapie");
+                    SearchResultTextBlock.Inlines.Add(link);
+                    SearchResultNameTextBox.Text = FoundLoaction.Name;
+                    this.FoundLocation = FoundLoaction;
+                }
+                else
+                {
+                    SearchResultTextBlock.Text = "Brak Rezultatów";
+                    this.FoundLocation = null;
+                }
+            }
+
+        }
+
+        private void Link_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.Uri.ToString());
+        }
+
+        private void SearchResultSaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (FoundLocation != null)
+            {
+                if (SearchResultNameTextBox.Text.Length > 0)
+                {
+                    var all = XManager.AllLocations;
+                    if (!all.Any(x => x.Name == SearchResultNameTextBox.Text))
+                    {
+                        if(!all.Any(x=>x==FoundLocation))
+                        {
+                            FoundLocation.Name = SearchResultNameTextBox.Text;
+                            AddLocation(FoundLocation);
+                            SearchGridBorder.Visibility = Visibility.Hidden;
+                            FoundLocation = null;
+                            CreateLocationComboBox.SelectedIndex = -1;
+                        }else
+                        {
+                            MessageBox.Show($"Identyczne miejsce już istnieje pod nazwą: {all.Where(x=>x==FoundLocation).Single().Name}", "Błąd");
+                        }
+                    }else
+                    {
+                        MessageBox.Show("Lokacja o tej nazwie już istnieje", "Błąd");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Nazwa musi zawierać conajmniej jeden znak", "Błąd");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Nie znleziono lokacji do zapisania", "Błąd");
+            }
         }
 
         protected override void OnClosing(CancelEventArgs e)

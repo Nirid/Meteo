@@ -89,6 +89,7 @@ namespace Meteo
         private System.Windows.Threading.DispatcherTimer NoInternetTimer;
         private DateTime NewestWeatherDate;
         private Location SelectedLocation;
+        private Location FoundLocation;
         private FileSet Displayed;
         private ObservableCollection<FileSet> Files;
         private object SyncObject = new object();

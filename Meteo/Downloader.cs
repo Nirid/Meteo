@@ -60,6 +60,8 @@ namespace Meteo
                     XDocument xdoc = XDocument.Load(response.GetResponseStream());
                     XElement result = xdoc.Element("GeocodeResponse").Element("result");
                     XElement status = xdoc.Element("GeocodeResponse").Element("status");
+                    if (status.Value != "OK")
+                        return null;
                     XElement location = result.Element("geometry").Element("location");
                     double lat = Convert.ToDouble(location.Element("lat").Value, CultureInfo.InvariantCulture);
                     double lon = Convert.ToDouble(location.Element("lng").Value, CultureInfo.InvariantCulture);
@@ -78,7 +80,7 @@ namespace Meteo
                     finalName = Regex.Replace(finalName, @"(\d{2}(-\d{3}))?", "");
                     finalName = finalName.Trim(' ');
 
-                    var loc = Location.GPSToLocation(new System.Device.Location.GeoCoordinate(lat, lon));
+                    var loc = Location.GPSToLocation(new System.Device.Location.GeoCoordinate(lon,lat));
                     loc.Name = finalName;
                     return loc;
                 }
