@@ -105,10 +105,14 @@ namespace Meteo
             {
                 SearchGridBorder.Visibility = Visibility.Visible;
                 SearchResultNameTextBox.Text = "";
+                SearchTextBox.Text = "";
                 FoundLocation = null;
             }
             else if (CreateLocationComboBox.SelectedIndex == 1)
             {
+                SearchGridBorder.Visibility = Visibility.Hidden;
+                SearchResultNameTextBox.Text = "";
+                FoundLocation = null;
                 var location = new Location("", XManager.LastLocation.X, XManager.LastLocation.Y, false);
                 var editWindow = new EditWindow(location, XManager.AllLocations, false);
                 var result = editWindow.ShowDialog();

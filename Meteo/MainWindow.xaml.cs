@@ -33,17 +33,19 @@ namespace Meteo
 
             System.IO.Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App");
             FolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App";
+            var htmlPath = FolderPath + "\\Html";
+            Directory.CreateDirectory(htmlPath);
 
             XManager = new XMLManager(FolderPath);
             Handler = new FileHandler(FolderPath);
             LegendHandler = new LegendHandler(FolderPath);
-            MapGen = new MapGenerator(FolderPath);
+            MapGen = new MapGenerator(htmlPath);
 
             Files = FileHandler.FileList;
             //TODO: sprawdizić które się pokrywają z lokacjami z XManager AllLocations i ustawić name i Update odpowiednio
             FileHandler.WeatherFileDownloaded += OnWeatherFileDownloaded;
-            FileHandler.InternetConnection += OnInternetConnection;
-            FileHandler.NoInternetConnection += OnNoInternetConnection;
+            FileHandler.InternetConnection += OnMeteoConnection;
+            FileHandler.NoInternetConnection += OnNoMeteoConnection;
             NewestWeatherDate = XManager.ReadLastUpdateDate();
             FileHandler.CheckNewestWeather(XManager.LastLocation, NewestWeatherDate);
 
@@ -94,7 +96,8 @@ namespace Meteo
         private ObservableCollection<FileSet> Files;
         private object SyncObject = new object();
         private object SyncObject2 = new object();
-        private bool IsInternetConnection = true;
+        private bool IsMeteoConnection = true;
+        private bool IsGoogleConnection = true;
 
         private void UpdateDispatcherTimer_Tick(object sender, EventArgs e)
         {
@@ -194,7 +197,7 @@ namespace Meteo
         /// </summary>
         private void ForceUpdate()
         {
-            if (!IsInternetConnection)
+            if (!IsMeteoConnection)
             {
                 NoInternetTimer.Stop();
                 NoInternetTimer_Tick(this, null);
@@ -370,18 +373,18 @@ namespace Meteo
         /// <summary>
         /// Fires when interent connection is lost
         /// </summary>
-        private void OnNoInternetConnection(object sender, EventArgs e)
+        private void OnNoMeteoConnection(object sender, EventArgs e)
         {
-            IsInternetConnection = false;
+            IsMeteoConnection = false;
             RefreshButton.Dispatcher.BeginInvoke(new Action(() => { RefreshButton.Background = Brushes.Red; }));
             NoInternetTimer.Start();
         }
         /// <summary>
         /// Fires when interent connetion is restored
         /// </summary>
-        private void OnInternetConnection(object sender, EventArgs e)
+        private void OnMeteoConnection(object sender, EventArgs e)
         {
-            IsInternetConnection = true;
+            IsMeteoConnection = true;
             RefreshButton.Dispatcher.BeginInvoke(new Action(() => { RefreshButton.Background = Brushes.LimeGreen; }));
             NoInternetTimer.Stop();
         }
