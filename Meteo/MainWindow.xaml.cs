@@ -47,11 +47,11 @@ namespace Meteo
             FileHandler.InternetConnection += OnMeteoConnection;
             FileHandler.NoInternetConnection += OnNoMeteoConnection;
             NewestWeatherDate = XManager.ReadLastUpdateDate();
-            FileHandler.CheckNewestWeather(XManager.LastLocation, NewestWeatherDate);
+            FileHandler.CheckNewestWeather(XManager.DefaultLocation, NewestWeatherDate);
 
             Locations = new ObservableCollection<Location>(XManager.AllLocations.ToList());
             CityList.ItemsSource = Locations;
-            SelectedLocation = XManager.LastLocation;
+            SelectedLocation = XManager.DefaultLocation;
             CityList.SelectedIndex = Locations.IndexOf(SelectedLocation);
             Locations.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(OnUpdateLocations);
 
@@ -257,13 +257,13 @@ namespace Meteo
         private bool RemoveLocation(Location location)
         {
             var all = XManager.AllLocations.ToList();
-            if (all.Contains(location) && location != XManager.LastLocation)
+            if (all.Contains(location) && location != XManager.DefaultLocation)
             {
                 all.Remove(location);
                 XManager.UpdateLocations(all);
                 Locations = new ObservableCollection<Location>(all);
                 CityList.ItemsSource = Locations;
-                CityList.SelectedIndex = Locations.IndexOf(XManager.LastLocation);
+                CityList.SelectedIndex = Locations.IndexOf(XManager.DefaultLocation);
                 return true;
             }
             return false;
@@ -277,7 +277,7 @@ namespace Meteo
         private bool ReplaceLocation(Location oldLocation,Location newLocation)
         {
             var all = XManager.AllLocations.ToList();
-            if (all.Contains(oldLocation) && oldLocation != XManager.LastLocation)
+            if (all.Contains(oldLocation) && oldLocation != XManager.DefaultLocation)
             {
                 var tempAll = all.ToList();
                 tempAll.Remove(oldLocation);
@@ -389,6 +389,6 @@ namespace Meteo
             NoInternetTimer.Stop();
         }
 
-        
+       
     }
 }

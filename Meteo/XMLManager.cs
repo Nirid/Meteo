@@ -37,7 +37,7 @@ namespace Meteo
         public Dictionary<Location, DateTime> SavedLocations;
         private static CultureInfo IC = CultureInfo.InvariantCulture;
         public IEnumerable<Location> AllLocations => Doc.Descendants("Location").Select(x => XElementToLocation(x));
-        public Location LastLocation => Doc.Descendants("LastLocation").Select(x => XElementToLocation(x)).Single();
+        public Location DefaultLocation => Doc.Descendants("LastLocation").Select(x => XElementToLocation(x)).Single();
         
         private void InitializeDocument()
         {
@@ -84,7 +84,7 @@ namespace Meteo
             Doc.Save(Path);
         }
 
-        public void SetLastLocation(Location location)
+        public void SetDefaultLocation(Location location)
         {
             var target = Doc.Descendants("LastLocation").Single();
             target.Element("X").Value = location.X.ToString(IC);

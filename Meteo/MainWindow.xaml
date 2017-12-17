@@ -32,12 +32,13 @@
         <Button x:Name="SetDefaultButton" Content="Ustaw jako domyślne" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top" Width="155" RenderTransformOrigin="0.427,0.9" Click="SetDefaultButton_Click"/>
         <Button x:Name="LocatonEditButton" Content="Edytuj lokalizację" HorizontalAlignment="Left" Margin="10,167,0,0" VerticalAlignment="Top" Width="155" Click="LocatonEditButton_Click"/>
         <Button x:Name="RemoveLocationButton" Content="Usuń lokalizację" HorizontalAlignment="Left" Margin="10,192,0,0" VerticalAlignment="Top" Width="155" Click="RemoveLocationButton_Click"/>
+        <Button x:Name="LocationListEditButton" Content="Edytuj kolejność na liście" HorizontalAlignment="Left" Margin="10,217,0,0" VerticalAlignment="Top" Width="155" Click="LocationListEditButton_Click"/>
         <Label Content="Miejsce:" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="CreateLocationComboBox" HorizontalAlignment="Left" Margin="10,263,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CreateLocationComboBox_SelectionChanged">
+        <ComboBox x:Name="CreateLocationComboBox" HorizontalAlignment="Left" Margin="10,280,0,0" VerticalAlignment="Top" Width="155" SelectionChanged="CreateLocationComboBox_SelectionChanged">
             <System:String>Z nazwy</System:String>
             <System:String>Podaj koordynaty</System:String>
         </ComboBox>
-        <Label Content="Dodaj miejsce:" HorizontalAlignment="Left" Margin="10,232,0,0" VerticalAlignment="Top"/>
+        <Label Content="Dodaj miejsce:" HorizontalAlignment="Left" Margin="10,249,0,0" VerticalAlignment="Top"/>
 
         <tb:TaskbarIcon x:Name="Notifycation" IconSource="Resources/icon.ico" ToolTipText="Meteo App" 
                         LeftClickCommand="{StaticResource Show}" LeftClickCommandParameter="{x:Reference Name=window}">
@@ -66,6 +67,7 @@
                 <Button x:Name="SearchResultSaveButton" Content="Zapisz" HorizontalAlignment="Left" Margin="13,192,0,0" VerticalAlignment="Top" Width="147" Click="SearchResultSaveButton_Click"/>
             </Grid>
         </Border>
+        
 
 
 

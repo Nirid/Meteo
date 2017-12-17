@@ -23,7 +23,7 @@ namespace Meteo
 
         private void SetDefaultButton_Click(object sender, RoutedEventArgs e)
         {
-            XManager.SetLastLocation((Location)CityList.SelectedItem);
+            XManager.SetDefaultLocation((Location)CityList.SelectedItem);
             SetDefaultButton.IsEnabled = false;
         }
 
@@ -60,7 +60,7 @@ namespace Meteo
                 return;
             }
             SelectedLocation = (Location)CityList.SelectedItem;
-            if (XManager.LastLocation == SelectedLocation)
+            if (XManager.DefaultLocation == SelectedLocation)
                 SetDefaultButton.IsEnabled = false;
             else
                 SetDefaultButton.IsEnabled = true;
@@ -71,7 +71,7 @@ namespace Meteo
 
         private void RemoveLocationButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedLocation != XManager.LastLocation)
+            if (SelectedLocation != XManager.DefaultLocation)
             {
                 MessageBoxResult message = MessageBox.Show($"Jesteś pewny, że chcesz usunąć {SelectedLocation.ToString()}?", "Potwierdź", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (message == MessageBoxResult.Yes)
@@ -99,6 +99,23 @@ namespace Meteo
             }
         }
 
+        private void LocationListEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            var listWindow = new ListWindow(XManager.AllLocations,XManager.DefaultLocation);
+            var result = listWindow.ShowDialog();
+            if(result == true)
+            {
+                var choosenLocation = (Location)CityList.SelectedItem;
+                XManager.UpdateLocations(listWindow.Locations);
+                Locations = listWindow.Locations;
+                CityList.ItemsSource = Locations;
+                if (Locations.Contains(choosenLocation))
+                    CityList.SelectedItem = choosenLocation;
+                else
+                    CityList.SelectedItem = XManager.DefaultLocation;
+            }
+        }
+
         private void CreateLocationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(CreateLocationComboBox.SelectedIndex == 0)
@@ -113,7 +130,7 @@ namespace Meteo
                 SearchGridBorder.Visibility = Visibility.Hidden;
                 SearchResultNameTextBox.Text = "";
                 FoundLocation = null;
-                var location = new Location("", XManager.LastLocation.X, XManager.LastLocation.Y, false);
+                var location = new Location("", XManager.DefaultLocation.X, XManager.DefaultLocation.Y, false);
                 var editWindow = new EditWindow(location, XManager.AllLocations, false);
                 var result = editWindow.ShowDialog();
                 var choosenLocation = editWindow.InitialLocation;

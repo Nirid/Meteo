@@ -5,8 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Meteo"
         mc:Ignorable="d"
-        Title="ListWindow" Height="300" Width="300">
+        Title="ListWindow" Height="300" Width="330.112">
     <Grid>
+        <ListBox x:Name="LocationsListBox" HorizontalAlignment="Left" Height="223" Margin="10,10,0,0" VerticalAlignment="Top" Width="195" ItemsSource="{Binding}">
+
+        </ListBox>
+        <DockPanel HorizontalAlignment="Left" Height="223" LastChildFill="False" Margin="210,10,0,0" VerticalAlignment="Top" Width="102">
+            <StackPanel Height="Auto" Width="102" >
+                <Label Content="Przesuwanie" />
+                <Button x:Name="MoveUpButton" Content="W górę" Click="MoveUpButton_Click" />
+                <Button x:Name="MoveDownButton" Content="W doł" Click="MoveDownButton_Click"/>
+                <Button x:Name="MoveTopButton" Content="Na szczyt" Click="MoveTopButton_Click"/>
+                <Button x:Name="MoveBottomButton" Content="Na spód" Click="MoveBottomButton_Click"/>
+                <Label Content="Opcje"/>
+                <Button x:Name="DisplayLocationButton" Content="Pokaż na mapie" Click="DisplayLocationButton_Click"/>
+                <Button x:Name="EditButton" Content="Edytuj" Click="EditButton_Click"/>
+                <Button x:Name="DeleteButton" Content="Usuń" Click="DeleteButton_Click"/>
+                <Separator/>
+                <Button x:Name="AddNewLocationButton" Content="Dodaj miejsce" Click="AddNewLocationButton_Click"/>
+
+            </StackPanel>
+        </DockPanel>
         
+        <Button x:Name="ConfirmButton" Content="Zapisz zmiany" HorizontalAlignment="Left" Margin="10,238,0,0" VerticalAlignment="Top" Width="127" Click="ConfirmButton_Click"/>
+        <Button x:Name="CancelButton" Content="Anuluj" HorizontalAlignment="Left" Margin="155,238,0,0" VerticalAlignment="Top" Width="127" Click="CancelButton_Click"/>
+
     </Grid>
 </Window>
