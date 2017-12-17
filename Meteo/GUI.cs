@@ -131,7 +131,9 @@ namespace Meteo
                 SearchGridBorder.Visibility = Visibility.Visible;
                 SearchResultNameTextBox.Text = "";
                 SearchTextBox.Text = "";
+                SearchResultTextBlock.Text = "";
                 FoundLocation = null;
+                SearchTextBox.Focus();
             }
             else if (CreateLocationComboBox.SelectedIndex == 1)
             {
@@ -178,6 +180,7 @@ namespace Meteo
                     SearchResultTextBlock.Inlines.Add(link);
                     SearchResultNameTextBox.Text = FoundLoaction.Name;
                     this.FoundLocation = FoundLoaction;
+                    SearchResultNameTextBox.Focus();
                 }
                 else
                 {
