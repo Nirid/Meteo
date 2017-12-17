@@ -30,7 +30,7 @@ namespace Meteo
         }
 
         public ObservableCollection<Location> Locations;
-        private Location DefaultLocation;
+        public Location DefaultLocation;
 
         /// <summary>
         /// Moves LocationsListBox.SelectedItem by requested number of places, to move to top use int.MinValue, to bottom int.MaxValue
@@ -91,22 +91,55 @@ namespace Meteo
 
         private void DisplayLocationButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (LocationsListBox.SelectedItem != null)
+                MapGenerator.DisplayLocation((Location)LocationsListBox.SelectedItem);
         }
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (LocationsListBox.SelectedItem != null)
+            {
+                var selected = (Location)LocationsListBox.SelectedItem;
+                var editWindow = new EditWindow(selected, Locations, true);
+                var result = editWindow.ShowDialog();
+                var location = editWindow.InitialLocation;
+                if (result == true)
+                {
+                    var tempAll = Locations.ToList();
+                    tempAll.Remove(selected);
+                    if (!tempAll.Contains(location) && !tempAll.Any(x => x.Name.Trim(' ').ToLower() == location.Name.Trim(' ').ToLower()))
+                    {
+                        if (selected == DefaultLocation)
+                            DefaultLocation = location;
+                        Locations[LocationsListBox.SelectedIndex] = location;
+                        LocationsListBox.SelectedItem = location;
+                    }   
+                }
+            }
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if(LocationsListBox.SelectedItem != null)
+            {
+                var selected = (Location)LocationsListBox.SelectedItem;
+                if (selected != DefaultLocation)
+                {
+                    Locations.Remove(selected);
+                }else
+                {
+                    MessageBox.Show("Nie można usnąć domyślnej lokalizacji, zmień domyślną lokalizację a następnie spróbuj usnąć lokalizację ponownie", "Błąd");
+                }
+            }
         }
 
-        private void AddNewLocationButton_Click(object sender, RoutedEventArgs e)
+        private void SetDefaultButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (LocationsListBox.SelectedItem != null)
+            {
+                var selected = (Location)LocationsListBox.SelectedItem;
+                DefaultLocation = selected;
+            }
         }
     }
 }

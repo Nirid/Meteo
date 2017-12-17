@@ -105,14 +105,22 @@ namespace Meteo
             var result = listWindow.ShowDialog();
             if(result == true)
             {
-                var choosenLocation = (Location)CityList.SelectedItem;
                 XManager.UpdateLocations(listWindow.Locations);
-                Locations = listWindow.Locations;
+                Locations = new ObservableCollection<Location>( listWindow.Locations);
+                CityList.ItemsSource = null;
                 CityList.ItemsSource = Locations;
-                if (Locations.Contains(choosenLocation))
-                    CityList.SelectedItem = choosenLocation;
-                else
-                    CityList.SelectedItem = XManager.DefaultLocation;
+                if (listWindow.DefaultLocation != XManager.DefaultLocation)
+                {
+                     XManager.SetDefaultLocation(listWindow.DefaultLocation);
+                }
+                if (Locations.Contains(SelectedLocation))
+                {
+                    CityList.SelectedIndex = Locations.IndexOf(SelectedLocation);
+                }else
+                {
+                    CityList.SelectedIndex = Locations.IndexOf(XManager.DefaultLocation);
+                }
+                SelectedLocationChanged();
             }
         }
 
