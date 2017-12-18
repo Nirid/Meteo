@@ -7,8 +7,39 @@ using System.Threading.Tasks;
 
 namespace Meteo
 {
-    partial class FileHandler
+     static class FolderManager
     {
+
+        public static void CheckNewestWeather(Location location, DateTime lastUpdateDate)
+        {
+            var now = DateTime.Now;
+            DateTime startDate;
+            if (now.Hour > 18)
+            {
+                startDate = now.Date;
+            }
+            else if (now.Hour > 12)
+            {
+                startDate = now.Date.AddHours(-6);
+            }
+            else if (now.Hour > 6)
+            {
+                startDate = now.Date.AddHours(-12);
+            }
+            else
+            {
+                startDate = now.Date.AddHours(-18);
+            }
+
+            while (startDate < now)
+            {
+                var set = new FileSet(location, startDate, FileSet.DownloadStatus.ToBeDownloaded);
+                if (startDate > lastUpdateDate && (FileHandler.FileList.Where(x => x.Location == set.Location && x.Date == set.Date).Count() == 0))
+                    FileHandler.FileList.Add(set);
+                startDate = startDate.AddHours(6);
+            }
+        }
+
         /// <summary>
         /// Checks folder for existing files and returns FileSets cooresponding to those files.
         /// </summary>
@@ -16,8 +47,8 @@ namespace Meteo
         public static IEnumerable<FileSet> CheckFolder(string path)
         {
             RemoveOutdatedFiles(path);
-            var set = from file in Directory.GetFiles(Path)
-                      let data = GetLocationAndDate(file)
+            var set = from file in Directory.GetFiles(path)
+                      let data = FileSet.GetLocationAndDate(file)
                       where data != null && data.Value.location != null
                       select new FileSet(data.Value.location, data.Value.date, FileSet.DownloadStatus.Downloaded);
 
@@ -28,8 +59,8 @@ namespace Meteo
         /// <param name="path">Path to folder</param>
         private static IEnumerable<FileSet> GetOutdatedAndDamagedFiles(string path)
         {
-            var allData = (from file in Directory.GetFiles(Path)
-                           let data = GetLocationAndDate(file)
+            var allData = (from file in Directory.GetFiles(path)
+                           let data = FileSet.GetLocationAndDate(file)
                            where data != null && data.Value.location != null
                            where (new FileInfo(file)).Length > 100000
                            select new FileSet(data.Value.location, data.Value.date, FileSet.DownloadStatus.Downloaded)).ToList();
@@ -44,8 +75,8 @@ namespace Meteo
                            where data.Date < DateTime.Now.AddDays(-2)
                            select data;
 
-            var tooSmall = from file in Directory.GetFiles(Path)
-                           let data = GetLocationAndDate(file)
+            var tooSmall = from file in Directory.GetFiles(path)
+                           let data = FileSet.GetLocationAndDate(file)
                            where data != null && data.Value.location != null
                            where new FileInfo(file).Length < 100000
                            select new FileSet(data.Value.location, data.Value.date, FileSet.DownloadStatus.Downloaded);
@@ -60,7 +91,7 @@ namespace Meteo
         {
             foreach (var file in GetOutdatedAndDamagedFiles(path))
             {
-                var set = FileList.Where(x => x == file);
+                var set = FileHandler.FileList.Where(x => x == file);
                 if (set.Count() != 0)
                 {
                     set.Single().Status = FileSet.DownloadStatus.ToBeDeleted;
@@ -69,7 +100,7 @@ namespace Meteo
                 {
                     try
                     {
-                        File.Delete(GetFilename(file));
+                        File.Delete(FileSet.GetFilename(file));
                     }
                     catch (IOException Ex)
                     {

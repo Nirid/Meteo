@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -62,7 +63,7 @@ namespace Meteo
 
         private static async Task<FileSet.DownloadStatus> DownloadAndVerifyLegend()
         {
-            if (await Downloader.DownloadLegend(LegendPath))
+            if (await DownloadLegend(LegendPath))
             {
                 FileInfo info = new FileInfo(LegendPath);
                 if (info.Length < (1 * 1000))
@@ -77,6 +78,24 @@ namespace Meteo
             else
             {
                 return FileSet.DownloadStatus.DownloadFailed;
+            }
+        }
+
+        public async static Task<bool> DownloadLegend(string path)
+        {
+            using (var client = new WebClient())
+            {
+                try
+                {
+                    await client.DownloadFileTaskAsync("http://www.meteo.pl/um/metco/leg_um_pl_cbase_256.png", path);
+                    return true;
+                }
+                catch (System.Net.WebException Ex)
+                {
+                    //TODO: Enter offline mode
+                    Logging.Log(Ex.ToString());
+                    return false;
+                }
             }
         }
     }

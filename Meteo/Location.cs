@@ -133,6 +133,17 @@ namespace Meteo
             return location;
         }
         /// <summary>
+        /// Transforms provided GeoCoordinate to Location with corresponding values.
+        /// </summary>
+        /// <param name="name">Name for Location created</param>
+        /// <param name="Update">If true Location will be updated whenever possible</param>
+        public static Location GPSToLocation(string name, GeoCoordinate position, bool Update)
+        {
+            Location location = GPSToLocation(name, position);
+            location.Update = Update;
+            return location;
+        }
+        /// <summary>
         /// Transforms Location object to corresponding GeoCoordinate.
         /// </summary>
         public static GeoCoordinate LocationToGPS(Location location)

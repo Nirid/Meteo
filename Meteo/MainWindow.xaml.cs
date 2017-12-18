@@ -35,19 +35,19 @@ namespace Meteo
             FolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Meteo App";
             var htmlPath = FolderPath + "\\Html";
             Directory.CreateDirectory(htmlPath);
+            FileSet.FolderPath = FolderPath;
 
             XManager = new XMLManager(FolderPath);
             Handler = new FileHandler(FolderPath);
             LegendHandler = new LegendHandler(FolderPath);
             MapGen = new MapGenerator(htmlPath);
-
             Files = FileHandler.FileList;
             //TODO: sprawdizić które się pokrywają z lokacjami z XManager AllLocations i ustawić name i Update odpowiednio
             FileHandler.WeatherFileDownloaded += OnWeatherFileDownloaded;
             FileHandler.InternetConnection += OnMeteoConnection;
             FileHandler.NoInternetConnection += OnNoMeteoConnection;
             NewestWeatherDate = XManager.ReadLastUpdateDate();
-            FileHandler.CheckNewestWeather(XManager.DefaultLocation, NewestWeatherDate);
+            FolderManager.CheckNewestWeather(XManager.DefaultLocation, NewestWeatherDate);
 
             Locations = new ObservableCollection<Location>(XManager.AllLocations.ToList());
             CityList.ItemsSource = Locations;
@@ -104,7 +104,7 @@ namespace Meteo
             lock (SyncObject2)
             {
                 CheckForNewestWeatherFiles();
-                FileHandler.CheckNewestWeather(SelectedLocation, NewestWeatherDate);
+                FolderManager.CheckNewestWeather(SelectedLocation, NewestWeatherDate);
                 SetTimeline(Files.Where(x => x.Status == FileSet.DownloadStatus.IsDisplayed).Single().Date);
             }
         }
@@ -112,7 +112,7 @@ namespace Meteo
         private void CleanupDispatcherTimer_Tick(object sender, EventArgs e)
         {
             if (!Files.Any(x => x.Status == FileSet.DownloadStatus.ToBeDownloaded || x.Status == FileSet.DownloadStatus.ToBeDeleted))
-                FileHandler.RemoveOutdatedFiles(FolderPath);
+                FolderManager.RemoveOutdatedFiles(FolderPath);
             MapGenerator.Cleanup(FolderPath);
         }
 
@@ -153,7 +153,7 @@ namespace Meteo
                         Displayed.Status = FileSet.DownloadStatus.Downloaded;
                     set.Status = FileSet.DownloadStatus.IsDisplayed;
                     Displayed = set;
-                    var uriWeather = new Uri(FileHandler.GetFilename(set));
+                    var uriWeather = new Uri(FileSet.GetFilename(set));
                     var uriWeatherLocal = new Uri(uriWeather.LocalPath);
                     var Bitmap = new BitmapImage(uriWeatherLocal);
                     Bitmap.Freeze();

@@ -1,53 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
-using System.Threading;
-using System.Xml.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Meteo
 {
-    class Downloader
+    static class Geocoding
     {
-        private static CultureInfo IC = CultureInfo.InvariantCulture;
-        public async static Task<bool> DownloadWeather(FileSet set, string path)
-        {
-            using (var client = new WebClient())
-            {
-                try
-                {
-                    await client.DownloadFileTaskAsync(new Uri($"http://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&fdate={set.Date.ToString("yyyyMMddHH", IC)}&row={set.Location.Y.ToString(IC)}&col={set.Location.X.ToString(IC)}&lang=pl"), path);
-                    return true;
-                }
-                catch (System.Net.WebException Ex)
-                {
-                    Logging.Log(Ex.ToString());
-                    return false;
-                }
-            }
-        }
-
-        public async static Task<bool> DownloadLegend(string path)
-        {
-            using (var client = new WebClient())
-            {
-                try
-                {
-                    await client.DownloadFileTaskAsync("http://www.meteo.pl/um/metco/leg_um_pl_cbase_256.png", path);
-                    return true;
-                }
-                catch (System.Net.WebException Ex)
-                {
-                    //TODO: Enter offline mode
-                    Logging.Log(Ex.ToString());
-                    return false;
-                }
-            }
-        }
-
         public static Location GetLocation(string name)
         {
             try
@@ -80,7 +44,7 @@ namespace Meteo
                     finalName = Regex.Replace(finalName, @"(\d{2}(-\d{3}))?", "");
                     finalName = finalName.Trim(' ');
 
-                    var loc = Location.GPSToLocation(new System.Device.Location.GeoCoordinate(lon,lat));
+                    var loc = Location.GPSToLocation(new System.Device.Location.GeoCoordinate(lon, lat));
                     loc.Name = finalName;
                     return loc;
                 }

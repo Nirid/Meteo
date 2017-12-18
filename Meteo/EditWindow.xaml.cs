@@ -104,7 +104,7 @@ namespace Meteo
                 UpdateTextBoxes(CurrentLocation);
                 return null;
             }
-            return Location.SnapToGrid(NameTextBox.Text, X, Y);
+            return Location.SnapToGrid(NameTextBox.Text, X, Y,UpdateCheckBox.IsChecked.Value);
         }
 
         private Location ReadGPS()
@@ -130,7 +130,7 @@ namespace Meteo
             else if (E > 90)
                 E = 90;
 
-            return Location.GPSToLocation(NameTextBox.Text, new GeoCoordinate(N,E)); 
+            return Location.GPSToLocation(NameTextBox.Text, new GeoCoordinate(N,E), UpdateCheckBox.IsChecked.Value); 
         }
 
         private void LocationChanged()

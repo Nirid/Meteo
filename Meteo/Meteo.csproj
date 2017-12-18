@@ -67,6 +67,7 @@
     <Compile Include="FileHandler.cs" />
     <Compile Include="FileSet.cs" />
     <Compile Include="FolderHandler.cs" />
+    <Compile Include="Geocoding.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="LegendHandler.cs" />
     <Compile Include="ListWindow.xaml.cs">
@@ -93,7 +94,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TaskbarIcon\Show.cs" />
-    <Compile Include="Downloader.cs" />
+    <Compile Include="WeatherDownloader.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="MainWindow.xaml.cs">

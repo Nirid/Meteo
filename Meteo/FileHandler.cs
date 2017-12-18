@@ -22,7 +22,7 @@ namespace Meteo
             FileList.ItemPropertyChanged += OnItemPropertyChanged;
             InternetConnection += OnInternetConnection;
             NoInternetConnection += OnNoInternetConnection;
-            foreach(var set in CheckFolder(Path))
+            foreach(var set in FolderManager.CheckFolder(Path))
             {
                 FileList.Add(set);
             }
@@ -36,29 +36,6 @@ namespace Meteo
         public static event EventHandler NoInternetConnection;
         public static event EventHandler InternetConnection;
         public static bool IsInternetConnection = true;
-
-        public static string GetName(Location location, DateTime date) => $"Date{date.ToString("yyyy-MM-dd-HH", IC)} X{location.X.ToString(IC)} Y{location.Y.ToString(IC)} .png";
-        public static string GetName(FileSet set) => GetName(set.Location, set.Date);
-        public static string GetFilename(Location location, DateTime date) => Path + "\\" + GetName(location, date);
-        /// <summary>
-        /// Returns filename corresponding to provided FileSet
-        /// </summary>
-        /// <param name="set"></param>
-        /// <returns></returns>
-        public static string GetFilename(FileSet set) => GetFilename(set.Location, set.Date);
-        /// <summary>
-        /// Returns Location and DateTime form filename.
-        /// </summary>
-        public static (Location location, DateTime date)? GetLocationAndDate(string str)
-        {
-            Regex regex = new Regex(@"Date(\d{4})-(\d{1,2})-(\d{1,2})-(\d{1,2}) X(\d{2,3}) Y(\d{2,3}) .png");
-            Match match = regex.Match(str);
-            if (!match.Success)
-                return null;
-            Location location = new Location(Convert.ToInt32(match.Groups[5].Value, IC), Convert.ToInt32(match.Groups[6].Value, IC));
-            DateTime date = new DateTime(Convert.ToInt32(match.Groups[1].Value, IC), Convert.ToInt32(match.Groups[2].Value, IC), Convert.ToInt32(match.Groups[3].Value, IC), Convert.ToInt32(match.Groups[4].Value, IC), 0, 0);
-            return (location, date);
-        }
 
         protected class ListChangedEventArgs
         {
@@ -91,7 +68,7 @@ namespace Meteo
                         {
                             if (set.Status == FileSet.DownloadStatus.ToBeDownloaded)
                             {
-                                var task = new Task<bool>(() => { return DownloadAndVerify(set).Result; });
+                                var task = new Task<bool>(() => { return WeatherDownloader.DownloadAndVerify(set).Result; });
                                 task.Start();
                                 return;
                             }
@@ -113,7 +90,7 @@ namespace Meteo
                         {
                             try
                             {
-                                File.Delete(GetFilename(set));
+                                File.Delete(FileSet.GetFilename(set));
                             }catch(IOException Ex)
                             {
                                 Logging.Log(Ex.ToString());
@@ -161,7 +138,7 @@ namespace Meteo
                         return;
                     }else if (set.Status == FileSet.DownloadStatus.ToBeDownloaded && previousStatus == FileSet.DownloadStatus.DownloadFailed)
                     {
-                        var task = new Task<bool>(() => { return DownloadAndVerify(set).Result; });
+                        var task = new Task<bool>(() => { return WeatherDownloader.DownloadAndVerify(set).Result; });
                         task.Start();
                         return;
                     }
@@ -176,61 +153,6 @@ namespace Meteo
         }
 
         public static event EventHandler<EventArgs> WeatherFileDownloaded;
-
-        public static void CheckNewestWeather(Location location, DateTime lastUpdateDate)
-        {
-            var now = DateTime.Now;
-            DateTime startDate;
-            if(now.Hour > 18)
-            {
-                startDate = now.Date;
-            }else if(now.Hour > 12)
-            {
-                startDate = now.Date.AddHours(-6);
-            }else if(now.Hour > 6)
-            {
-                startDate = now.Date.AddHours(-12);
-            }else
-            {
-                startDate = now.Date.AddHours(-18);
-            }
-
-            while(startDate < now)
-            {
-                var set = new FileSet(location, startDate, FileSet.DownloadStatus.ToBeDownloaded);
-                if (startDate > lastUpdateDate && (FileList.Where(x => x.Location == set.Location && x.Date == set.Date).Count() == 0))
-                    FileList.Add(set);
-                startDate = startDate.AddHours(6);
-            }
-        }
-
-        private static async Task<bool> DownloadAndVerify(FileSet set)
-        {
-            string filename = GetFilename(set.Location, set.Date);
-            if (await Downloader.DownloadWeather(set, filename))
-            {
-                if (new FileInfo(filename).Length < 20000)
-                {
-                    set.Status = FileSet.DownloadStatus.NoWeatherFile;
-                    return false;
-                }
-                else
-                {
-                    set.Status = FileSet.DownloadStatus.Downloaded;
-                    return true;
-                }
-            }
-            else
-            {
-                if (set.Status == FileSet.DownloadStatus.ToBeDownloaded)
-                {
-                    set.Status = FileSet.DownloadStatus.DownloadFailed;
-                    return false;
-                }
-                else
-                    throw new InvalidOperationException();
-            }
-        }
 
         private static void OnInternetConnection(object sendet, EventArgs e)
         {

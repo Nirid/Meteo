@@ -168,7 +168,7 @@ namespace Meteo
             SearchResultNameTextBox.Text = "";
             if (SearchTextBox.Text.Count() > 0)
             {
-                var FoundLoaction = Downloader.GetLocation(SearchTextBox.Text);
+                var FoundLoaction = Geocoding.GetLocation(SearchTextBox.Text);
                 if (FoundLoaction != null)
                 {
                     SearchResultTextBlock.Text = "Znaleziono lokalizację\n";

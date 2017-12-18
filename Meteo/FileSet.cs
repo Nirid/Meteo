@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace Meteo
 {
@@ -18,6 +20,7 @@ namespace Meteo
         public Location Location { get; }
         public DateTime Date { get; }
         private DownloadStatus status;
+        public static string FolderPath;
         public DownloadStatus Status {
             get { return status; }
             set
@@ -83,5 +86,28 @@ namespace Meteo
         }
 
         public enum DownloadStatus { ToBeDownloaded, Downloaded, IsDisplayed, DownloadFailed, NoWeatherFile, ToBeDeleted };
+
+        public static string GetName(Location location, DateTime date) => $"Date{date.ToString("yyyy-MM-dd-HH", CultureInfo.InvariantCulture)} X{location.X.ToString(CultureInfo.InvariantCulture)} Y{location.Y.ToString(CultureInfo.InvariantCulture)} .png";
+        public static string GetName(FileSet set) => GetName(set.Location, set.Date);
+        public static string GetFilename(Location location, DateTime date) => FolderPath + "\\" + GetName(location, date);
+        /// <summary>
+        /// Returns filename corresponding to provided FileSet
+        /// </summary>
+        /// <param name="set"></param>
+        /// <returns></returns>
+        public static string GetFilename(FileSet set) => GetFilename(set.Location, set.Date);
+        /// <summary>
+        /// Returns Location and DateTime form filename.
+        /// </summary>
+        public static (Location location, DateTime date)? GetLocationAndDate(string str)
+        {
+            Regex regex = new Regex(@"Date(\d{4})-(\d{1,2})-(\d{1,2})-(\d{1,2}) X(\d{2,3}) Y(\d{2,3}) .png");
+            Match match = regex.Match(str);
+            if (!match.Success)
+                return null;
+            Location location = new Location(Convert.ToInt32(match.Groups[5].Value, CultureInfo.InvariantCulture), Convert.ToInt32(match.Groups[6].Value, CultureInfo.InvariantCulture));
+            DateTime date = new DateTime(Convert.ToInt32(match.Groups[1].Value, CultureInfo.InvariantCulture), Convert.ToInt32(match.Groups[2].Value, CultureInfo.InvariantCulture), Convert.ToInt32(match.Groups[3].Value, CultureInfo.InvariantCulture), Convert.ToInt32(match.Groups[4].Value, CultureInfo.InvariantCulture), 0, 0);
+            return (location, date);
+        }
     }
 }
