@@ -25,7 +25,7 @@
 
             </StackPanel>
         </DockPanel>
-        
+      
         <Button x:Name="ConfirmButton" Content="Zapisz zmiany" HorizontalAlignment="Left" Margin="10,269,0,0" VerticalAlignment="Top" Width="127" Click="ConfirmButton_Click"/>
         <Button x:Name="CancelButton" Content="Anuluj" HorizontalAlignment="Left" Margin="185,269,0,0" VerticalAlignment="Top" Width="127" Click="CancelButton_Click"/>
 
