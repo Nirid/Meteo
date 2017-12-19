@@ -26,7 +26,6 @@ namespace Meteo
             {
                 FileList.Add(set);
             }
-
         }
 
         public static string Path { get; private set; }

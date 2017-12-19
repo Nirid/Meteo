@@ -388,7 +388,5 @@ namespace Meteo
             RefreshButton.Dispatcher.BeginInvoke(new Action(() => { RefreshButton.Background = Brushes.LimeGreen; }));
             NoInternetTimer.Stop();
         }
-
-       
     }
 }

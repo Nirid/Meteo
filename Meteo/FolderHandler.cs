@@ -30,7 +30,6 @@ namespace Meteo
             {
                 startDate = now.Date.AddHours(-18);
             }
-
             while (startDate < now)
             {
                 var set = new FileSet(location, startDate, FileSet.DownloadStatus.ToBeDownloaded);

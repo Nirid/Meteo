@@ -44,7 +44,6 @@ namespace Meteo
             {
                 return false;
             }
-
             return f1.Status == f2.Status && f1.Location == f2.Location && f1.Date == f2.Date;
         }
 
